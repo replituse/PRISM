@@ -96,12 +96,12 @@ export function BookingForm({ open, onOpenChange, booking, defaultDate }: Bookin
   const selectedCustomerId = form.watch("customerId");
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects", { customerId: selectedCustomerId }],
+    queryKey: [`/api/projects?customerId=${selectedCustomerId}`],
     enabled: !!selectedCustomerId,
   });
 
   const { data: contacts = [] } = useQuery<CustomerContact[]>({
-    queryKey: ["/api/customers", selectedCustomerId, "contacts"],
+    queryKey: [`/api/customers/${selectedCustomerId}/contacts`],
     enabled: !!selectedCustomerId,
   });
 
