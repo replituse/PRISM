@@ -50,9 +50,13 @@ export default function LoginPage() {
         securityPin: data.securityPin,
         companyId: data.companyId ? parseInt(data.companyId) : undefined,
       });
-      return response;
+      const jsonData = await response.json();
+      return jsonData;
     },
     onSuccess: (data: any) => {
+      if (!data.user) {
+        throw new Error("Invalid response from server");
+      }
       const company = companies.find(c => c.id === data.user.companyId) || null;
       login(data.user, company);
       toast({
