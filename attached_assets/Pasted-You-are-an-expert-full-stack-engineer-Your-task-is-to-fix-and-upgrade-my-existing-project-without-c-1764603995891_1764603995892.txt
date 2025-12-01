@@ -1,0 +1,232 @@
+You are an expert full-stack engineer.
+Your task is to fix and upgrade my existing project without changing the database structure.
+Do NOT modify the MySQL table names, fields, or schema.
+Use all existing MySQL queries exactly as defined in the current project.
+
+✅ 1. GENERAL REQUIREMENTS
+
+Fix all broken functions
+
+Fix all API workflow issues
+
+Make every module work end-to-end
+
+Ensure all data updates live (real-time refresh after CRUD operations)
+
+Complete all missing logic
+
+Fix undefined variables, incorrect states, wrong parameters, etc.
+
+Clean up duplicate code
+
+Improve performance
+
+Keep same database (DO NOT change any table or column)
+
+✅ 2. STRICT DATABASE SETUP (DO NOT CHANGE)
+
+Use the existing MySQL Workbench database with the following environment variables already in project:
+
+MYSQL_HOST=127.0.0.1  
+MYSQL_USER=root  
+MYSQL_PASSWORD=12345  
+MYSQL_DATABASE=prism
+
+
+Do NOT:
+
+migrate to PostgreSQL
+
+generate new schema
+
+modify SQL structure
+
+Only improve queries where needed for correctness.
+
+✅ 3. FIX THE ENTIRE WORKFLOW & MODULES
+
+Update and repair all modules so they work 100% as expected:
+
+Operations
+
+Booking System
+
+Create, edit, delete, cancel booking working properly
+
+Conflict logic working correctly
+
+Ignore conflict checkbox working
+
+Repeat booking working
+
+Actual time calculation correct
+
+Break-hour calculation correct
+
+Status: Planning, Tentative, Confirmed working
+
+Live update after save/delete
+
+Booking logs show correct history
+
+Editor Leave Entry
+
+Add/edit/delete leaves
+
+Validation + date checks
+
+Chalan Entry
+
+Create chalan
+
+Calculate totals correctly
+
+Apply GST/Non-GST based on user login
+
+Stored values appear correctly
+
+Chalan Revise
+
+Edit existing chalan
+
+Update old chalan values properly
+
+Recalculate totals
+
+✅ 4. FIX ALL MASTER MODULES
+
+Ensure full CRUD operations work without any error:
+
+Customer Master
+
+Project Master
+
+Room Master
+
+Editor Master
+
+User Management / Rights
+
+Requirements:
+
+All values should reflect immediately in dropdowns (Customer → Project → Editor).
+
+Active/inactive filters must work.
+
+Double-click edit should open update modal and save correctly.
+
+✅ 5. REPORTS MODULE — FIX & COMPLETE
+
+Make all reports fully functional with filters + export:
+
+1. Conflict Report
+
+Accurate conflict detection
+
+Date wise filtering
+
+Customer / Project / Editor / Room filters
+
+2. Booking Report
+
+Customer / Project Type / Project / Room / Editor filters
+
+Cancel checkbox filter
+
+Actual time not entered filter
+
+Export to CSV, Excel, PDF
+
+Column search + sorting
+
+3. Editor Report
+
+Complete total hours calculation
+
+List bookings grouped by date
+
+Printable format (14 rows/page)
+
+PDF/Excel export
+
+4. Chalan Report
+
+Chalan listing
+
+Cancel chalan support
+
+Print format view
+
+Export PDF/Excel
+
+✅ 6. MODERN ATTRACTIVE UI IMPROVEMENT
+
+Update UI to a clean, modern, light color theme:
+
+Apply the following:
+
+Soft pastel background
+
+Clean card layout
+
+Smooth animations
+
+Consistent padding & spacing
+
+Better forms and inputs
+
+Replace outdated UI blocks
+
+Modern responsive design
+
+Improve calendar layout
+
+Improve sidebar / header
+
+The UI must look professional, minimal and easy to use.
+
+✅ 7. LIVE DATA REFRESH
+
+Every CRUD operation must immediately reflect on UI without reload using:
+
+State updates
+
+React query or Axios refresh
+
+Auto refresh booking calendar
+
+Real-time data binding
+
+✅ 8. FIX BACKEND + FRONTEND CONNECTION
+
+Ensure all routes work
+
+Fix wrong endpoints
+
+Fix missing parameters
+
+Validate all inputs
+
+Improve error handling
+
+Clean console errors
+
+✅ 9. DO NOT BREAK EXISTING LOGIN
+
+Keep the current authentication system intact.
+
+Admin full access
+
+GST billing user
+
+Non-GST billing user
+
+Permissions must continue working
+
+🎯 FINAL TASK
+
+Refactor, clean, fix, and modernize the entire existing project.
+Make ALL functions work smoothly and in proper logical flow.
+Keep the same database structure and MySQL Workbench.
+Upgrade UI to attractive light theme.
+Make Reports, Booking, Leaves, Chalan, Masters fully functional and stable.
