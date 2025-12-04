@@ -1,0 +1,310 @@
+Project Context:
+This is a Post-Production Studio Management Software (PRISM) with modules:
+
+Operations (Booking, Leave Entry, Chalan, Chalan Revise)
+
+Masters (Customer, Project, Room, Editor, Users)
+
+Reports (Booking, Conflict, Editor, Chalan, Leave)
+
+Utility (User Rights & Role Access)
+
+⚠️ VERY IMPORTANT INSTRUCTIONS FOR YOU:
+
+❌ Do NOT change any existing UI design, layout, theme, structure, or navigation
+
+✅ Only fix workflow, logic, permissions, reports, syncing, validations & bugs
+
+✅ Use existing database only (NO DB structure change unless absolutely required)
+
+✅ Add only light, normal color combination for better readability (no redesign)
+
+✅ Make all modules properly connected and live-sync updated
+
+✅ 1. BOOKING MODULE – COMPLETE WORKFLOW FIX
+
+Fix the full real-life workflow as per these rules:
+
+Calendar based booking by Room & Date
+
+Fields:
+Customer, Project, Room, Editor, Contact Person, From Time, To Time, Actual From Time, Actual To Time, Break Hours, Total Hours, Status (Planning, Tentative, Confirmed), Cancel Flag
+
+✅ Logic Rules:
+
+Cancel Booking:
+
+Once cancelled, it must lock editing
+
+Show vertical cancellation mark
+
+Save cancellation reason
+
+Conflict Handling:
+
+If Editor OR Room = Ignore Conflict, allow duplicate booking
+
+If NOT ignore conflict → block duplicate booking
+
+On save → show Conflict Alert with count
+
+Billing Logic:
+
+Final Billing Time = (From–To) – (Actual Time – Break Hours)
+
+
+Repeat Booking:
+
+Clicking Project Name → Open Repeat Dialog
+
+Select multiple days → auto create bookings
+
+Apply same conflict logic
+
+Once Chalan or Invoice generated → Show flag on Project (Yes/No)
+
+Hover / Click Booking → Show Footer Logs:
+
+Left Log: Contact Person, Mobile, Remarks
+
+Right Log: Full change history with timestamp (Editor, Date, Time, Status, Room, Project)
+
+✅ After every new booking → auto update:
+
+Booking Report
+
+Conflict Report
+
+Editor Report
+
+Chalan Pending Report
+
+✅ 2. LEAVE ENTRY (EDITOR)
+
+Fields: Editor, Leave From, Leave To, Notes
+
+Prevent booking on leave dates
+
+Leave entries must reflect in:
+
+Conflict Report
+
+Booking Warnings
+
+✅ 3. CHALAN ENTRY & CHALAN REVISE (CRITICAL FIX)
+
+Chalan must be:
+
+Generated only from Confirmed Booking
+
+Linked to Project + Customer
+
+Chalan Revise:
+
+Allow edit of existing chalan only
+
+Maintain revision history
+
+Cancelled Chalan:
+
+Must display in Chalan Report if checkbox selected
+
+Print cancelled chalan slip properly
+
+✅ 4. MASTER MODULE – DATA FLOW FIX
+✅ Customer Master:
+
+Multiple Contact Persons for each customer (second table)
+
+No delete → Only Active / Inactive
+
+Double click → Open edit
+
+Customer Name & Short Name mandatory
+
+✅ Project Master:
+
+Customer & Contact Person → Auto pulled from Customer Master
+
+Project Type:
+Movie, Teaser, Advertise, Serial, Web Series, Trilogy
+
+Project Type must auto-save & reappear in dropdown
+
+Sorting must work on each column
+
+Double click → Edit
+
+✅ Room Master:
+
+Type saved dynamically & reused in dropdown
+
+Ignore Conflict ✔ logic must reflect in Booking
+
+Active/Inactive must hide inactive rooms
+
+✅ Editor Master:
+
+Leaving Date checkbox → Auto inactive
+
+Ignore Conflict ✔ must reflect in Booking
+
+Join Date, Leaving Date logic must work
+
+✅ 5. REPORTS – FULLY FUNCTIONAL WITH EXPORT
+✅ A) Conflict Report
+
+Based on:
+Editor + Time + Room
+
+Filters:
+Customer, Project Type, Project, Room, Editor, Status, From Date, To Date
+
+✅ B) Booking Report
+
+Filters:
+Customer, Project Type, Project, Room, Editor, Status
+
+Special Filters:
+
+Actual Time Not Entered
+
+Cancelled Booking
+
+Column Search Filtering (Type to search)
+
+✅ Export:
+
+Excel
+
+CSV
+
+Copy-Paste
+
+✅ C) Editor Report + PRINT FORMAT FIX
+
+Date Range filter
+
+Print Format:
+
+14 entries per page
+
+Show:
+Booking Date, Project, Client, From–To, Actual From–To, Break, Total Time
+
+Auto calculate:
+✅ Editor Total Hours
+
+✅ D) Chalan Report
+
+Customer filter
+
+Date range
+
+Cancel Chalan filter
+
+Proper print slip with:
+
+Project rows
+
+Signature area
+
+Extra info
+
+✅ 6. USER MANAGEMENT & ROLE ACCESS (STRICT RULES)
+
+Create proper Role-Based Access Control:
+
+✅ Roles:
+
+Admin → Full access
+
+GST Billing
+
+Non-GST Billing
+
+✅ Rules:
+
+If user has:
+
+Only Master Access → Show ONLY Master Modules
+
+Only Report Access → Hide Operations & Masters
+
+Only Booking Access → Hide Chalan, Masters, Reports
+
+✅ Menu visibility must change dynamically based on rights
+✅ Backend API must also enforce permissions (not just UI)
+
+✅ 7. DASHBOARD (DO NOT CHANGE DESIGN)
+
+Do not change layout, cards, charts
+
+Just ensure:
+
+Live booking count
+
+Today’s revenue
+
+Pending chalan
+
+Active rooms
+
+Active editors
+update in real-time
+
+✅ 8. UI COLOR IMPROVEMENT (LIGHT ONLY)
+
+Use:
+
+Light grey background
+
+Soft blue highlights
+
+Soft green success
+
+Soft red cancel
+
+❌ Do NOT change:
+
+Fonts
+
+Layout
+
+Tabs
+
+Menu structure
+
+✅ 9. SYSTEM STABILITY & DATA FLOW
+
+Fix:
+
+Unauthorized access errors
+
+Blank report bugs
+
+Booking not reflecting in reports
+
+Chalan not syncing with booking
+
+Add:
+
+Proper validation
+
+Toast alerts
+
+API error handling
+
+✅ FINAL DELIVERY REQUIREMENTS
+
+✅ Zero UI redesign
+
+✅ Only workflow, logic & report fixes
+
+✅ Smooth live data updates
+
+✅ Proper role-based access
+
+✅ All exports & printing 100% functional
+
+✅ Clean light-color UI polish only
