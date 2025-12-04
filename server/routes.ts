@@ -9,23 +9,35 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
   app.post("/api/auth/login", async (req, res) => {
     try {
       const data = loginSchema.parse(req.body);
-      const user = await storage.getUserByUsername(data.username);
+      
+      // Find user by username and company
+      const user = await storage.getUserByUsernameAndCompany(data.username, data.companyId);
       
       if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Invalid username or PIN for the selected company" });
       }
       
       if (user.securityPin !== data.securityPin) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Invalid username or PIN" });
       }
       
       if (!user.isActive) {
-        return res.status(401).json({ message: "Account is inactive" });
+        return res.status(401).json({ message: "Account is inactive. Please contact administrator." });
+      }
+      
+      // Get company details
+      const company = await storage.getCompany(data.companyId);
+      if (!company) {
+        return res.status(400).json({ message: "Selected company not found" });
       }
       
       const { password, securityPin, ...userWithoutSensitive } = user;
-      res.json({ user: userWithoutSensitive });
+      res.json({ user: userWithoutSensitive, company });
     } catch (error: any) {
+      if (error.name === "ZodError") {
+        const firstError = error.errors[0];
+        return res.status(400).json({ message: firstError.message });
+      }
       res.status(400).json({ message: error.message });
     }
   });

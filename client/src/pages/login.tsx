@@ -19,7 +19,7 @@ import type { Company } from "@shared/schema";
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   securityPin: z.string().min(4, "Security PIN must be at least 4 characters"),
-  companyId: z.string().optional(),
+  companyId: z.string().min(1, "Please select a company to continue"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -45,20 +45,33 @@ export default function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginForm) => {
-      const response = await apiRequest("POST", "/api/auth/login", {
-        username: data.username,
-        securityPin: data.securityPin,
-        companyId: data.companyId ? parseInt(data.companyId) : undefined,
-      });
-      const jsonData = await response.json();
-      return jsonData;
+      try {
+        const response = await apiRequest("POST", "/api/auth/login", {
+          username: data.username,
+          securityPin: data.securityPin,
+          companyId: parseInt(data.companyId),
+        });
+        const jsonData = await response.json();
+        return jsonData;
+      } catch (error: any) {
+        const message = error.message || "Login failed";
+        const jsonMatch = message.match(/\d+:\s*(.+)/);
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[1]);
+            throw new Error(parsed.message || "Login failed");
+          } catch {
+            throw new Error(jsonMatch[1] || "Login failed");
+          }
+        }
+        throw error;
+      }
     },
     onSuccess: (data: any) => {
       if (!data.user) {
         throw new Error("Invalid response from server");
       }
-      const company = companies.find(c => c.id === data.user.companyId) || null;
-      login(data.user, company);
+      login(data.user, data.company || null);
       toast({
         title: "Welcome back!",
         description: `Logged in as ${data.user.username}`,

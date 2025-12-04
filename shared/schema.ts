@@ -380,7 +380,7 @@ export type ChalanWithItems = Chalan & {
 export const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   securityPin: z.string().min(4, "Security PIN must be at least 4 characters"),
-  companyId: z.number().optional(),
+  companyId: z.number({ required_error: "Please select a company to continue" }).min(1, "Please select a company to continue"),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
