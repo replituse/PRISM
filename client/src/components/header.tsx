@@ -55,38 +55,31 @@ export function Header({
     <header className="sticky top-0 z-50 flex h-14 items-center gap-4 border-b header-light-blue px-4">
       <SidebarTrigger data-testid="button-sidebar-toggle" />
       
-      {/* Left side: Page Title */}
-      {title && (
-        <div className="flex items-center">
-          <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+      {/* Left side: Live Day + Time (no box) */}
+      <div className="flex items-center gap-1.5 text-sm" data-testid="header-live-time">
+        <Clock className="h-4 w-4 text-muted-foreground" />
+        <span className="font-medium">
+          {formatDayOnly(liveDateTime)} {formatTime12Hour(liveDateTime)}
+        </span>
+      </div>
+
+      {/* Date (no box) */}
+      {showDatePicker && (
+        <div 
+          className="flex items-center gap-1.5 text-sm"
+          data-testid="header-locked-date"
+        >
+          <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">{formatDateLocked(liveDateTime)}</span>
         </div>
       )}
 
       {/* Spacer to push right content */}
       <div className="flex-1" />
 
-      {/* Right side: Day/Time, Company selector, Theme toggle */}
+      {/* Right side: Company selector (with box), Theme toggle */}
       <div className="flex items-center gap-3">
-        {/* Live Day + Time */}
-        <div className="flex items-center gap-1.5 text-sm smooth-hover px-3 py-2 rounded-md bg-white/50 dark:bg-white/10" data-testid="header-live-time">
-          <Clock className="h-4 w-4 text-muted-foreground" />
-          <span className="font-mono font-medium">
-            {formatDayOnly(liveDateTime)} {formatTime12Hour(liveDateTime)}
-          </span>
-        </div>
-
-        {/* Locked Live Date */}
-        {showDatePicker && (
-          <div 
-            className="flex items-center gap-2 px-3 py-2 border rounded-md bg-white/50 dark:bg-white/10 text-sm smooth-hover cursor-default"
-            data-testid="header-locked-date"
-          >
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">{formatDateLocked(liveDateTime)}</span>
-          </div>
-        )}
-
-        {/* Company Selector */}
+        {/* Company Selector - keeps the box styling */}
         {showCompanySelector && companies.length > 0 && (
           <Select 
             value={company?.id?.toString() || ""} 
