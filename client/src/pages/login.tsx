@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { apiRequest } from "@/lib/queryClient";
 import type { Company } from "@shared/schema";
+import productionBg from "@assets/stock_images/film_production_stud_a0473fe5.jpg";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -92,13 +93,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen flex flex-col relative">
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${productionBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/80" />
+      
+      <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
       
-      <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center p-6 relative z-10">
+        <Card className="w-full max-w-md bg-background/95 backdrop-blur-sm">
           <CardHeader className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
               <Film className="w-8 h-8 text-primary" />
@@ -143,20 +150,21 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Security PIN</FormLabel>
                       <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <div className="relative flex items-center">
+                          <Lock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                           <Input
                             type={showPin ? "text" : "password"}
                             placeholder="Enter your PIN"
-                            className="pl-10 pr-10"
+                            className="pl-10 pr-12"
                             data-testid="input-security-pin"
+                            autoComplete="current-password"
                             {...field}
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                            className="absolute right-0 h-9"
                             onClick={() => setShowPin(!showPin)}
                             data-testid="button-toggle-pin-visibility"
                           >
@@ -232,7 +240,7 @@ export default function LoginPage() {
         </Card>
       </div>
 
-      <footer className="py-4 text-center text-xs text-muted-foreground">
+      <footer className="py-4 text-center text-xs text-white/70 relative z-10">
         PRISM Post-Production Management System
       </footer>
     </div>
