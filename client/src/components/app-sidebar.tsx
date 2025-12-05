@@ -130,10 +130,18 @@ function SidebarNavGroup({
 export function AppSidebar() {
   const { user, company, logout } = useAuth();
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [openSection, setOpenSection] = useState<string>("Operations");
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(["Operations"]));
 
   const handleToggleSection = (section: string) => {
-    setOpenSection(openSection === section ? "" : section);
+    setOpenSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(section)) {
+        newSet.delete(section);
+      } else {
+        newSet.add(section);
+      }
+      return newSet;
+    });
   };
 
   const getRoleBadge = (role: string) => {
@@ -171,25 +179,25 @@ export function AppSidebar() {
         <SidebarNavGroup 
           label="Operations" 
           items={operationsItems} 
-          isOpen={openSection === "Operations"}
+          isOpen={openSections.has("Operations")}
           onToggle={() => handleToggleSection("Operations")}
         />
         <SidebarNavGroup 
           label="Masters" 
           items={mastersItems} 
-          isOpen={openSection === "Masters"}
+          isOpen={openSections.has("Masters")}
           onToggle={() => handleToggleSection("Masters")}
         />
         <SidebarNavGroup 
           label="Reports" 
           items={reportsItems} 
-          isOpen={openSection === "Reports"}
+          isOpen={openSections.has("Reports")}
           onToggle={() => handleToggleSection("Reports")}
         />
         <SidebarNavGroup 
           label="Utility" 
           items={utilityItems} 
-          isOpen={openSection === "Utility"}
+          isOpen={openSections.has("Utility")}
           onToggle={() => handleToggleSection("Utility")}
         />
       </SidebarContent>

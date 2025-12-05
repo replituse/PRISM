@@ -64,7 +64,7 @@ export function Header({
         <div className="flex items-center gap-1.5 text-sm" data-testid="header-live-time">
           <Clock className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium">
-            {formatDayOnly(liveDateTime)} {formatTime12Hour(liveDateTime)}
+            {formatDayOnly(liveDateTime)}, {formatTime12Hour(liveDateTime)}
           </span>
         </div>
 
