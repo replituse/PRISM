@@ -285,8 +285,7 @@ export default function BookingPage() {
                   key={day.toISOString()}
                   className={cn(
                     "bg-background min-h-[120px] p-1 flex flex-col group",
-                    !isCurrentMonth && "bg-muted/30",
-                    isPastDate && isCurrentMonth && "bg-muted/10"
+                    !isCurrentMonth && "bg-muted/30"
                   )}
                   data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                 >
