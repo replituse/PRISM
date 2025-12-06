@@ -12,7 +12,38 @@ import {
   chalans,
   chalanItems
 } from "@shared/schema";
-import { eq } from "drizzle-orm";
+
+async function seedDemoUsers(prismCompanyId: number, airavataCompanyId: number) {
+  // Create additional users (15 demo users - ignore duplicates)
+  const additionalUsers = [
+    { username: "gst_user", password: "user123", securityPin: "1234", role: "gst" as const, companyId: prismCompanyId, fullName: "GST User", email: "gst@prism.com", mobile: "9876500001", isActive: true },
+    { username: "non_gst_user", password: "user123", securityPin: "1234", role: "non_gst" as const, companyId: prismCompanyId, fullName: "Non-GST User", email: "nongst@prism.com", mobile: "9876500002", isActive: true },
+    { username: "ops_manager", password: "user123", securityPin: "2345", role: "admin" as const, companyId: prismCompanyId, fullName: "Operations Manager", email: "ops@prism.com", mobile: "9876500003", isActive: true },
+    { username: "booking_staff", password: "user123", securityPin: "3456", role: "non_gst" as const, companyId: prismCompanyId, fullName: "Booking Staff", email: "booking@prism.com", mobile: "9876500004", isActive: true },
+    { username: "accounts_head", password: "user123", securityPin: "4567", role: "gst" as const, companyId: prismCompanyId, fullName: "Accounts Head", email: "accounts@prism.com", mobile: "9876500005", isActive: true },
+    { username: "reception", password: "user123", securityPin: "5678", role: "non_gst" as const, companyId: prismCompanyId, fullName: "Reception Staff", email: "reception@prism.com", mobile: "9876500006", isActive: true },
+    { username: "floor_manager", password: "user123", securityPin: "6789", role: "non_gst" as const, companyId: prismCompanyId, fullName: "Floor Manager", email: "floor@prism.com", mobile: "9876500007", isActive: true },
+    { username: "studio_head", password: "user123", securityPin: "7890", role: "admin" as const, companyId: prismCompanyId, fullName: "Studio Head", email: "studio@prism.com", mobile: "9876500008", isActive: true },
+    { username: "vfx_supervisor", password: "user123", securityPin: "8901", role: "non_gst" as const, companyId: prismCompanyId, fullName: "VFX Supervisor", email: "vfx@prism.com", mobile: "9876500009", isActive: true },
+    { username: "sound_engineer", password: "user123", securityPin: "9012", role: "non_gst" as const, companyId: prismCompanyId, fullName: "Sound Engineer", email: "sound@prism.com", mobile: "9876500010", isActive: true },
+    { username: "di_colorist", password: "user123", securityPin: "0123", role: "non_gst" as const, companyId: prismCompanyId, fullName: "DI Colorist", email: "di@prism.com", mobile: "9876500011", isActive: true },
+    { username: "airavata_user", password: "user123", securityPin: "1111", role: "non_gst" as const, companyId: airavataCompanyId, fullName: "Airavata Staff", email: "staff@airavata.com", mobile: "9876500012", isActive: true },
+    { username: "airavata_gst", password: "user123", securityPin: "2222", role: "gst" as const, companyId: airavataCompanyId, fullName: "Airavata Accounts", email: "accounts@airavata.com", mobile: "9876500013", isActive: true },
+    { username: "airavata_ops", password: "user123", securityPin: "3333", role: "admin" as const, companyId: airavataCompanyId, fullName: "Airavata Operations", email: "ops@airavata.com", mobile: "9876500014", isActive: true },
+    { username: "airavata_booking", password: "user123", securityPin: "4444", role: "non_gst" as const, companyId: airavataCompanyId, fullName: "Airavata Booking", email: "booking@airavata.com", mobile: "9876500015", isActive: true },
+  ];
+
+  let usersCreated = 0;
+  for (const user of additionalUsers) {
+    try {
+      await db.insert(users).values(user);
+      usersCreated++;
+    } catch (e: any) {
+      if (e.code !== '23505') throw e; // Ignore duplicate key errors
+    }
+  }
+  console.log(`Created ${usersCreated} new demo users (${additionalUsers.length} total attempted)`);
+}
 
 async function seedDemoData() {
   console.log("Seeding demo data for December 2025...");
@@ -35,7 +66,10 @@ async function seedDemoData() {
   // Check if demo data already exists
   const existingCustomers = await db.select().from(customers);
   if (existingCustomers.length >= 15) {
-    console.log("Demo data already exists with 15+ customers, skipping...");
+    console.log("Demo data already exists with 15+ customers, adding users only...");
+    
+    // Still seed users even if other data exists
+    await seedDemoUsers(prismCompany.id, airavataCompany.id);
     return;
   }
 
@@ -338,20 +372,8 @@ async function seedDemoData() {
   }
   console.log(`Created ${chalanData.length} chalans for December 2025`);
 
-  // Create additional users (ignore duplicates)
-  const additionalUsers = [
-    { username: "gst_user", password: "user123", securityPin: "1234", role: "gst" as const, companyId: prismCompany.id, fullName: "GST User", email: "gst@prism.com", mobile: "9876500001" },
-    { username: "non_gst_user", password: "user123", securityPin: "1234", role: "non_gst" as const, companyId: prismCompany.id, fullName: "Non-GST User", email: "nongst@prism.com", mobile: "9876500002" },
-  ];
-
-  for (const user of additionalUsers) {
-    try {
-      await db.insert(users).values(user);
-    } catch (e: any) {
-      if (e.code !== '23505') throw e; // Ignore duplicate key errors
-    }
-  }
-  console.log("Processed additional demo users");
+  // Create additional demo users
+  await seedDemoUsers(prismCompany.id, airavataCompany.id);
 
   console.log("\n=== Demo Data Summary ===");
   console.log("Customers: 15");
@@ -361,6 +383,7 @@ async function seedDemoData() {
   console.log("Bookings: 30 (15 Nov + 15 Dec 2025)");
   console.log("Leaves: 15");
   console.log("Chalans: 30 (15 Nov + 15 Dec 2025)");
+  console.log("Users: 15 (additional demo users + 2 admins from seed.ts)");
   console.log("========================\n");
 
   console.log("Demo data seeding complete!");

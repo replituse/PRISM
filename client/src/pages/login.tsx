@@ -201,25 +201,34 @@ export default function LoginPage() {
                       <FormLabel>Company</FormLabel>
                       <div className="relative">
                         <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={companies.length === 0}>
                           <FormControl>
                             <SelectTrigger data-testid="select-company" className="pl-10">
-                              <SelectValue placeholder="Select a company" />
+                              <SelectValue placeholder={companies.length === 0 ? "No companies available" : "Select a company"} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {companies.map((company) => (
-                              <SelectItem 
-                                key={company.id} 
-                                value={company.id.toString()}
-                                data-testid={`select-company-${company.id}`}
-                              >
-                                {company.name}
-                              </SelectItem>
-                            ))}
+                            {companies.length === 0 ? (
+                              <div className="py-6 text-center text-sm text-muted-foreground">
+                                No companies found. Please contact administrator.
+                              </div>
+                            ) : (
+                              companies.map((company) => (
+                                <SelectItem 
+                                  key={company.id} 
+                                  value={company.id.toString()}
+                                  data-testid={`select-company-${company.id}`}
+                                >
+                                  {company.name}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
+                      {companies.length === 0 && (
+                        <p className="text-xs text-muted-foreground">Database setup required. Please wait or contact support.</p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

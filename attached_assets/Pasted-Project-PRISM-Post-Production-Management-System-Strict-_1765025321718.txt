@@ -1,0 +1,156 @@
+Project: PRISM – Post-Production Management System
+Strict Rules:
+
+❌ Do NOT change dashboard layout or structure
+
+❌ Do NOT break existing workflows (Booking, Chalan, Reports, Users)
+
+✅ Only apply color unification, login fix, and demo data insertion
+
+✅ Keep database structure unchanged
+
+✅ 1. GLOBAL BUTTON & ACTIVE STATE COLOR – MATCH SIDEBAR HEADER
+🎯 Goal:
+
+Make the entire project follow ONE consistent color theme based on the Sidebar Header color (Operations, Master, Reports, Utility).
+
+✅ Required Changes:
+
+✅ Apply the same sidebar header color to:
+
+All primary buttons
+
+All active buttons
+
+All selected tabs
+
+All hover states
+
+All submit buttons
+
+All modal action buttons
+
+All pagination active buttons
+
+Sign-In page buttons
+
+✅ This includes:
+
+✅ Login / Sign In button
+
+✅ New Booking button
+
+✅ Save / Update / Submit buttons
+
+✅ Print / Download buttons
+
+✅ Confirm / Yes buttons
+
+✅ Active icons & toggles
+
+✅ Button Style Rules:
+
+Background → Sidebar Header Color
+
+Text → White
+
+Hover → Slightly darker shade
+
+Border → None or soft shadow
+
+Radius → Keep existing design consistency
+
+✅ This must apply globally across the entire project UI.
+
+✅ 2. LOGIN PAGE – FIX COMPANY SELECTION (NOT SELECTABLE)
+❌ Current Issue:
+
+User cannot select any company during login.
+
+✅ Required Fix:
+
+✅ Company dropdown on login must:
+
+Be clickable
+
+Load company list dynamically
+
+Allow selection
+
+Validate selection before login
+
+Pass selected company into backend session
+
+✅ Company options must include:
+
+Company
+PRISM
+Airavata Studio
+
+✅ Selected company must be reflected in:
+
+Header
+
+Booking
+
+Chalan
+
+Reports
+
+User Management
+
+✅ Login must FAIL if:
+
+Username is correct
+
+PIN is correct
+
+BUT company is NOT selected
+
+✅ 3. DEMO DATA – ADD 15 RECORDS IN ALL MODULES
+
+✅ Insert 15 demo records per module in:
+
+✅ Operations (Bookings)
+
+✅ Master (Customers, Projects, Rooms, Editors)
+
+✅ Reports
+
+✅ Utility (Users, Roles)
+
+✅ Conflict Reports
+
+✅ Chalan (Entry + Report)
+
+✅ Demo Data Rules:
+
+Random realistic data
+
+Proper inter-linking between:
+
+Booking → Customer → Project → Room → Editor → Chalan
+
+Should appear in:
+
+Reports
+
+Dashboard
+
+Conflict Report
+
+Chalan Report
+
+✅ Must NOT overwrite existing real data
+✅ Must work with pagination and filters
+
+✅ FINAL ACCEPTANCE CRITERIA
+
+After implementation:
+
+✅ All buttons match sidebar header color theme
+✅ Active button states look consistent everywhere
+✅ Login page company dropdown is selectable
+✅ Selected company is reflected throughout the app
+✅ 15 demo records exist in every module
+✅ Demo records appear correctly in reports & dashboard
