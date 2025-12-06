@@ -1,0 +1,327 @@
+✅ PROFESSIONAL REPLIT PROMPT – PRISM PROJECT (BOOKING, CHALAN, LOGIN, SIDEBAR, ROLE ACCESS, UI, DEMO DATA)
+
+Project Name: PRISM – Post-Production Management System
+Important Global Rules:
+
+❌ Do NOT change existing database structure unless required for feature completion
+
+❌ Do NOT break current workflow (Booking → Conflict → Chalan → Report)
+
+❌ Do NOT change dashboard layout structure
+
+✅ Only fix logic, UI behavior, permissions, and workflows correctly
+
+✅ Follow light blue UI theme (not dark)
+
+✅ 1. BOOKING FORM – CLIENT ROOM & CLIENT EDITOR SELECTION
+🎯 Problem:
+
+Client may have:
+
+Only Editor
+
+Only Room
+
+Both
+
+Or neither
+
+✅ Required Final Behavior:
+
+In Booking Form → Room & Editor dropdowns:
+
+✅ Dropdown must show:
+
+✅ Internal Rooms & Editors
+
+✅ Client-owned Rooms & Editors
+
+✅ Proper tags:
+
+(Client Room)
+
+(Client Editor)
+
+✅ If selected:
+
+Auto-bind client room/editor details into booking
+
+Save correctly into DB
+
+✅ Scenarios Supported:
+
+Client Owns	Editor	Room
+Yes	No	✅
+No	Yes	✅
+Yes	Yes	✅
+No	No	✅
+
+✅ No validation conflict should block saving.
+
+✅ 2. SIDEBAR HEADER COLOR – OPERATIONS, MASTER, REPORTS, UTILITY
+
+✅ Set sidebar section headers background color =
+same light blue as “New Booking” button in dashboard
+
+✅ Apply to:
+
+Operations
+
+Master
+
+Reports
+
+Utility
+
+✅ Text color = White
+✅ Hover effect = Slightly darker blue
+
+✅ 3. CHALAN VIEW – FULL PREVIEW, NO CROPPING + PROFESSIONAL FORMAT
+✅ Fix Cropping Issue:
+
+✅ When clicking:
+
+👁 View Chalan
+
+From Chalan Entry
+
+From Chalan Report
+
+➡️ It must open in:
+
+✅ Full width
+
+✅ Proper scroll
+
+✅ No crop
+
+✅ Full page preview
+
+✅ Chalan Header Must Contain:
+
+✅ Current Date & Time (Auto)
+✅ Company Name:
+
+PRISM
+
+Or Airavata Studio (based on login)
+
+✅ Chalan Number Auto-Generated
+
+✅ Chalan Body Must Include:
+
+✅ All Booking Form Data:
+
+Customer
+
+Project
+
+Room
+
+Editor
+
+Date
+
+Time
+
+Actual From/To
+
+Break Hrs
+
+Total Hours
+
+Amount
+
+✅ Items Table:
+
+Description
+
+Qty
+
+Rate
+
+Amount
+
+✅ Totals Section:
+
+Subtotal
+
+GST (if any)
+
+Final Total
+
+✅ Footer Must Include:
+
+✅ Signature Boxes:
+
+Prepared By
+
+Approved By
+
+Director
+
+✅ Buttons:
+
+✅ Print
+
+✅ Download PDF
+
+✅ Design must follow 2nd uploaded invoice design style (modern clean invoice look).
+
+✅ 4. LOGIN WITH COMPANY SELECTION + FIXED USERS
+
+✅ Show Company Dropdown on Login Page
+
+✅ Login Credentials:
+
+Company	Username	PIN
+PRISM	admin	1234
+Airavata Studio	airavata_admin	1234
+
+✅ After login:
+
+Company name must reflect everywhere:
+
+Header
+
+Reports
+
+Chalan
+
+Booking
+
+✅ 5. BOOKING CARD (3 DOT MENU) – NEW OPTIONS
+
+On clicking 3 dots on booking card, show menu:
+
+✅ View Logs
+✅ Cancel Booking
+✅ Create Chalan → Redirect to Chalan Entry
+✅ View Chalan → Opens exact filtered report
+
+✅ Conditions:
+
+If chalan exists → Show View Chalan
+
+If not → Show Create Chalan
+
+✅ 6. UTILITY → USER MANAGEMENT → ROLE BASED ACCESS (STRICT)
+
+✅ Each User Role Must Have Strict Access:
+
+Role	Allowed Access
+Admin	Full System
+GST / Accountant	Only Reports + Chalan
+Operations User	Only Operations
+Viewer	View Only
+
+✅ Sidebar must dynamically hide unauthorized sections.
+
+✅ 7. USER MANAGEMENT – EDIT OWN PROFILE (PROPER UI)
+
+✅ Admin/User can edit ONLY via:
+
+Utility → User Management → Edit
+
+
+✅ Editable Fields:
+
+Name
+
+Email
+
+Mobile
+
+Status
+
+Role
+
+✅ Changes must:
+
+Save in DB
+
+Reflect immediately after refresh
+
+✅ Edit UI:
+
+Light blue theme
+
+Clean spacing
+
+Icons inside inputs
+
+✅ Admin Profile Icon (AD):
+
+❌ View only
+
+❌ No edit here
+
+✅ 8. CHALAN ENTRY VS REPORT RIGHTS
+
+✅ Chalan Entry:
+
+View Mode Only (No edit)
+
+✅ Chalan Report:
+
+View
+
+Print
+
+PDF Export
+
+✅ 9. DEMO DATA INSERTION (MANDATORY)
+
+✅ Insert 15 Demo Records Per Module in:
+
+Operations (Bookings)
+
+Masters (Customer, Project, Room, Editor)
+
+Reports
+
+Chalan
+
+Conflict Report
+
+Utility → Users
+
+✅ Conditions:
+
+✅ All demo bookings:
+
+Month: December 2025 only
+
+1–2 day gap pattern
+
+Each day: 1–3 bookings
+
+2 conflict records minimum
+
+✅ All data should be:
+
+Interlinked properly
+
+Used in reports
+
+Used in conflict
+
+Used in chalan
+
+✅ FINAL ACCEPTANCE RESULT
+
+After implementation:
+
+✅ Booking supports client editor/room
+✅ Sidebar headers light blue
+✅ Chalan opens full, no crop
+✅ Chalan professional invoice format
+✅ Print & PDF enabled
+✅ Company based login works properly
+✅ Booking 3-dot menu fully functional
+✅ Role based sidebar access enforced
+✅ User edit works only in User Management
+✅ Chalan entry = view only
+✅ Chalan report = view + print + export
+✅ 15 demo data per module inserted
+✅ All demo data limited to December 2025

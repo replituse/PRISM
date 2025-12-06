@@ -42,31 +42,73 @@ import { useAuth } from "@/lib/auth-context";
 import { UserProfileModal } from "@/components/user-profile-modal";
 import { cn } from "@/lib/utils";
 
-const operationsItems = [
+type UserRole = "admin" | "gst" | "non_gst";
+
+interface MenuItem {
+  title: string;
+  url: string;
+  icon: any;
+  roles?: UserRole[];
+}
+
+interface MenuSection {
+  label: string;
+  items: MenuItem[];
+  roles?: UserRole[];
+}
+
+const operationsItems: MenuItem[] = [
   { title: "Booking", url: "/", icon: Calendar },
   { title: "Leaves Entry", url: "/leaves", icon: UserMinus },
-  { title: "Chalan Entry", url: "/chalan", icon: FileText },
-  { title: "Chalan Revise", url: "/chalan/revise", icon: ClipboardList },
+  { title: "Chalan Entry", url: "/chalan", icon: FileText, roles: ["admin", "gst"] },
+  { title: "Chalan Revise", url: "/chalan/revise", icon: ClipboardList, roles: ["admin", "gst"] },
 ];
 
-const mastersItems = [
+const mastersItems: MenuItem[] = [
   { title: "Customer Master", url: "/masters/customers", icon: Users },
   { title: "Project Master", url: "/masters/projects", icon: Film },
   { title: "Room Master", url: "/masters/rooms", icon: Building2 },
   { title: "Editor Master", url: "/masters/editors", icon: UserCircle },
 ];
 
-const reportsItems = [
+const reportsItems: MenuItem[] = [
   { title: "Conflict Report", url: "/reports/conflict", icon: AlertTriangle },
   { title: "Booking Report", url: "/reports/booking", icon: CalendarDays },
   { title: "Editor Report", url: "/reports/editor", icon: UserCog },
-  { title: "Chalan Report", url: "/reports/chalan", icon: FileSpreadsheet },
+  { title: "Chalan Report", url: "/reports/chalan", icon: FileSpreadsheet, roles: ["admin", "gst"] },
 ];
 
-const utilityItems = [
+const utilityItems: MenuItem[] = [
   { title: "User Rights", url: "/utility/user-rights", icon: Shield },
   { title: "User Management", url: "/utility/users", icon: Settings },
 ];
+
+const menuSections: MenuSection[] = [
+  { label: "Operations", items: operationsItems },
+  { label: "Masters", items: mastersItems, roles: ["admin", "gst"] },
+  { label: "Reports", items: reportsItems },
+  { label: "Utility", items: utilityItems, roles: ["admin"] },
+];
+
+function filterItemsByRole(items: MenuItem[], userRole: UserRole): MenuItem[] {
+  return items.filter(item => {
+    if (!item.roles) return true;
+    return item.roles.includes(userRole);
+  });
+}
+
+function filterSectionsByRole(sections: MenuSection[], userRole: UserRole): MenuSection[] {
+  return sections
+    .filter(section => {
+      if (!section.roles) return true;
+      return section.roles.includes(userRole);
+    })
+    .map(section => ({
+      ...section,
+      items: filterItemsByRole(section.items, userRole),
+    }))
+    .filter(section => section.items.length > 0);
+}
 
 function SidebarNavGroup({
   label,
@@ -132,6 +174,9 @@ export function AppSidebar() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(["Operations"]));
 
+  const userRole = (user?.role as UserRole) || "non_gst";
+  const filteredSections = filterSectionsByRole(menuSections, userRole);
+
   const handleToggleSection = (section: string) => {
     setOpenSections(prev => {
       const newSet = new Set(prev);
@@ -176,30 +221,15 @@ export function AppSidebar() {
       <SidebarSeparator />
 
       <SidebarContent className="pt-4">
-        <SidebarNavGroup 
-          label="Operations" 
-          items={operationsItems} 
-          isOpen={openSections.has("Operations")}
-          onToggle={() => handleToggleSection("Operations")}
-        />
-        <SidebarNavGroup 
-          label="Masters" 
-          items={mastersItems} 
-          isOpen={openSections.has("Masters")}
-          onToggle={() => handleToggleSection("Masters")}
-        />
-        <SidebarNavGroup 
-          label="Reports" 
-          items={reportsItems} 
-          isOpen={openSections.has("Reports")}
-          onToggle={() => handleToggleSection("Reports")}
-        />
-        <SidebarNavGroup 
-          label="Utility" 
-          items={utilityItems} 
-          isOpen={openSections.has("Utility")}
-          onToggle={() => handleToggleSection("Utility")}
-        />
+        {filteredSections.map((section) => (
+          <SidebarNavGroup 
+            key={section.label}
+            label={section.label} 
+            items={section.items} 
+            isOpen={openSections.has(section.label)}
+            onToggle={() => handleToggleSection(section.label)}
+          />
+        ))}
       </SidebarContent>
 
       <SidebarSeparator />

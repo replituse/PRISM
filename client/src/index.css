@@ -383,37 +383,25 @@
     }
   }
 
-  /* Sidebar group label styling - dark permanent background */
+  /* Sidebar group label styling - light blue matching primary button */
   .sidebar-group-label {
-    background: linear-gradient(135deg, 
-      hsl(200 55% 30%) 0%, 
-      hsl(200 50% 35%) 100%
-    );
+    background: hsl(200 100% 50%);
     color: white !important;
     transition: all 200ms ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   }
 
   .sidebar-group-label:hover {
-    background: linear-gradient(135deg, 
-      hsl(200 60% 35%) 0%, 
-      hsl(200 55% 40%) 100%
-    );
+    background: hsl(200 100% 45%);
   }
 
   .dark .sidebar-group-label {
-    background: linear-gradient(135deg, 
-      hsl(200 45% 22%) 0%, 
-      hsl(200 40% 28%) 100%
-    );
+    background: hsl(200 100% 55%);
     color: white !important;
   }
 
   .dark .sidebar-group-label:hover {
-    background: linear-gradient(135deg, 
-      hsl(200 50% 28%) 0%, 
-      hsl(200 45% 32%) 100%
-    );
+    background: hsl(200 100% 50%);
   }
 
   .sidebar-group-label span {

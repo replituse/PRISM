@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import {
   format,
   startOfMonth,
@@ -73,6 +74,7 @@ const YEARS = Array.from({ length: 11 }, (_, i) => 2020 + i);
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function BookingPage() {
+  const [, navigate] = useLocation();
   const { selectedDate, setSelectedDate } = useAuth();
   const { toast } = useToast();
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -174,6 +176,15 @@ export default function BookingPage() {
       setSelectedDate(date);
     }
     setBookingFormOpen(true);
+  };
+
+  const handleCreateChalan = (booking: BookingWithRelations) => {
+    navigate(`/chalan?customerId=${booking.customerId}&projectId=${booking.projectId}`);
+    toast({ title: "Redirecting to create chalan", description: `Pre-filling with ${booking.customer?.name} - ${booking.project?.name}` });
+  };
+
+  const handleViewChalan = (booking: BookingWithRelations) => {
+    navigate(`/reports/chalan?customerId=${booking.customerId}&projectId=${booking.projectId}`);
   };
 
   const statusCounts = useMemo(() => {
@@ -401,6 +412,8 @@ export default function BookingPage() {
                           onEdit={handleEditBooking}
                           onCancel={handleCancelBooking}
                           onViewLogs={handleViewLogs}
+                          onCreateChalan={handleCreateChalan}
+                          onViewChalan={handleViewChalan}
                           compact
                         />
                       ))}

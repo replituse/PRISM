@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
-import { Plus, Pencil, Trash2, FileText, Printer, Eye, X } from "lucide-react";
+import { Plus, Trash2, FileText, Eye, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,10 +33,10 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Header } from "@/components/header";
 import { DataTable, Column } from "@/components/data-table";
 import { EmptyState } from "@/components/empty-state";
+import { ChalanInvoice } from "@/components/chalan-invoice";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { ChalanWithItems, Customer, Project } from "@shared/schema";
@@ -170,10 +170,6 @@ export default function ChalanPage() {
   const handleViewChalan = (chalan: ChalanWithItems) => {
     setViewingChalan(chalan);
     setViewDialogOpen(true);
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   const onSubmit = (data: ChalanFormValues) => {
@@ -486,103 +482,14 @@ export default function ChalanPage() {
       </Dialog>
 
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="max-w-3xl print:max-w-none print:m-0 print:shadow-none">
-          <DialogHeader className="print:hidden">
-            <DialogTitle>Chalan Details</DialogTitle>
-            <DialogDescription>
-              View and print chalan details.
-            </DialogDescription>
-          </DialogHeader>
-
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0 print:max-w-none print:m-0 print:shadow-none">
           {viewingChalan && (
-            <div className="space-y-6 print:p-8">
-              <div className="text-center border-b pb-4">
-                <h2 className="text-2xl font-bold">CHALAN</h2>
-                <p className="text-muted-foreground">{viewingChalan.chalanNumber}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Customer</p>
-                  <p className="font-medium">{viewingChalan.customer?.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Project</p>
-                  <p className="font-medium">{viewingChalan.project?.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Date</p>
-                  <p className="font-mono">{format(new Date(viewingChalan.chalanDate), "PPP")}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge variant={viewingChalan.isCancelled ? "destructive" : "default"}>
-                    {viewingChalan.isCancelled ? "Cancelled" : "Active"}
-                  </Badge>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h4 className="font-medium mb-3">Items</h4>
-                <table className="w-full border">
-                  <thead>
-                    <tr className="bg-muted">
-                      <th className="text-left p-2 border">Description</th>
-                      <th className="text-right p-2 border w-20">Qty</th>
-                      <th className="text-right p-2 border w-28">Rate</th>
-                      <th className="text-right p-2 border w-28">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {viewingChalan.items?.map((item, index) => (
-                      <tr key={index}>
-                        <td className="p-2 border">{item.description}</td>
-                        <td className="text-right p-2 border font-mono">{item.quantity}</td>
-                        <td className="text-right p-2 border font-mono">Rs. {item.rate}</td>
-                        <td className="text-right p-2 border font-mono">Rs. {item.amount}</td>
-                      </tr>
-                    ))}
-                    <tr className="font-bold bg-muted">
-                      <td colSpan={3} className="text-right p-2 border">Total</td>
-                      <td className="text-right p-2 border font-mono">
-                        Rs. {(viewingChalan.totalAmount || 0).toLocaleString()}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {viewingChalan.notes && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Notes</p>
-                  <p>{viewingChalan.notes}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-5 gap-4 pt-8">
-                {["Prepared By", "Checked By", "Approved By", "Received By", "Authority"].map(
-                  (label) => (
-                    <div key={label} className="text-center">
-                      <div className="border-t border-foreground pt-2 mt-12" />
-                      <p className="text-xs text-muted-foreground">{label}</p>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
+            <ChalanInvoice 
+              chalan={viewingChalan} 
+              onClose={() => setViewDialogOpen(false)}
+              showActions={true}
+            />
           )}
-
-          <DialogFooter className="print:hidden gap-2">
-            <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
-              Close
-            </Button>
-            <Button onClick={handlePrint} data-testid="button-print-chalan">
-              <Printer className="h-4 w-4 mr-2" />
-              Print
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
