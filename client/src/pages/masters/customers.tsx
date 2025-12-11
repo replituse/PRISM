@@ -46,30 +46,7 @@ import { EmptyState } from "@/components/empty-state";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import type { CustomerWithContacts, Customer, CustomerContact } from "@shared/schema";
-
-const DEFAULT_DESIGNATIONS = [
-  "Director",
-  "Producer",
-  "Executive Producer",
-  "Line Producer",
-  "Production Manager",
-  "Production Coordinator",
-  "Post-Production Supervisor",
-  "Editor",
-  "Sound Designer",
-  "Colorist",
-  "VFX Supervisor",
-  "Creative Director",
-  "Marketing Head",
-  "Finance Manager",
-  "Accounts Manager",
-  "CEO",
-  "CFO",
-  "COO",
-  "Managing Director",
-  "General Manager",
-];
+import type { CustomerWithContacts, Customer, CustomerContact, Designation } from "@shared/schema";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -98,23 +75,44 @@ export default function CustomersPage() {
   const [editingCustomer, setEditingCustomer] = useState<CustomerWithContacts | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(null);
-  const [customDesignations, setCustomDesignations] = useState<string[]>([]);
   const [addDesignationDialogOpen, setAddDesignationDialogOpen] = useState(false);
   const [newDesignation, setNewDesignation] = useState("");
   const [designationPopoverOpen, setDesignationPopoverOpen] = useState<{[key: number]: boolean}>({});
 
+  const { data: designations = [] } = useQuery<Designation[]>({
+    queryKey: ["/api/designations"],
+  });
+
   const allDesignations = useMemo(() => {
-    const combined = [...DEFAULT_DESIGNATIONS, ...customDesignations];
-    return [...new Set(combined)].sort();
-  }, [customDesignations]);
+    return designations.map(d => d.name).sort();
+  }, [designations]);
+
+  const addDesignationMutation = useMutation({
+    mutationFn: async (name: string) => {
+      return apiRequest("POST", "/api/designations", { name });
+    },
+    onSuccess: (_, name) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/designations"] });
+      toast({ title: `Designation "${name}" added` });
+      setNewDesignation("");
+      setAddDesignationDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error adding designation",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleAddDesignation = () => {
     if (newDesignation.trim() && !allDesignations.includes(newDesignation.trim())) {
-      setCustomDesignations(prev => [...prev, newDesignation.trim()]);
-      toast({ title: `Designation "${newDesignation.trim()}" added` });
+      addDesignationMutation.mutate(newDesignation.trim());
+    } else {
+      setNewDesignation("");
+      setAddDesignationDialogOpen(false);
     }
-    setNewDesignation("");
-    setAddDesignationDialogOpen(false);
   };
 
   const { data: customers = [], isLoading } = useQuery<CustomerWithContacts[]>({
