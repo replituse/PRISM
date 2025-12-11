@@ -1,0 +1,295 @@
+✅ Replit Professional Prompt — Apply the Below Changes to My Existing Project
+
+Do not change major functionality or DB schema unless absolutely required. Paste this into your Replit task/issue and assign frontend + backend devs.
+
+1) Conflict Report — Resolve when max 3 conflicts on same date
+
+Goal: When a date has ≥1 conflicts and up to 3 conflicts, present a clear UI and resolution flow.
+
+Requirements
+
+Show conflict list grouped by date and resource (room/editor/project).
+
+If <= 3 conflicts on same date, show them inline and allow resolution actions:
+
+Mark Resolved (status = resolved)
+
+Reschedule — open a scheduler that suggests next free slots (auto-suggest next 3 available dates/times)
+
+Reassign Resource — suggest alternate room/editor based on availability
+
+Create Note — free-text note for audit trail
+
+After resolution, update booking records and reflect in Reports / Dashboard / Chalan.
+
+If > 3 conflicts, show a “Batch Resolve” flow (out of scope for details — only UI hint).
+
+Backend logic
+
+Add column/flag conflict_status (pending, resolved, in_review) in conflict table or use existing.
+
+Provide API: GET /conflicts?date=YYYY-MM-DD and POST /conflicts/:id/resolve with { action: "mark_resolved"|"reschedule"|"reassign", payload }.
+
+Acceptance Test
+
+Create 3 conflicting bookings on same date → conflict report shows all 3 with actions → choose reschedule → booking times update and conflict disappears.
+
+2) Booking Dashboard — “Explore More (+2 more)” → Full Day View (not popup)
+
+Goal: When dashboard shows “+N more” or Explore/More and user clicks, open a full-screen Day View (Google Calendar-style) with back button.
+
+Requirements
+
+Dashboard day cell with >3 items shows only latest 3 and “+X more / Explore” button.
+
+Click → navigate to /#/calendar/day/YYYY-MM-DD (full screen, not modal).
+
+Day View shows all bookings for that date with details (time, customer, project, room, editor, chalan status).
+
+Provide Back button top-left to return to previous screen.
+
+Visual design: attractive, follow project color palette; show timeline column and stacked events similar to Google Calendar.
+
+Frontend
+
+Implement a route CalendarDayView — full-screen component, mobile responsive.
+
+Use virtualized list for many bookings (lazy loading).
+
+Acceptance Test
+
+Click “+2 more” for a date with 5 bookings → full screen opens showing 5 bookings with details + functional back button.
+
+3) Day View Button — Full-Screen Options (Every Day / Date Select)
+
+Goal: Add Day View button beside Month Filter that lets user:
+
+Select a specific date (calendar picker) OR
+
+View "Every Day" (today's date or continuously scrollable days)
+
+Requirements
+
+Buttons near month filter: [Day View] [Schedule Booking]
+
+Clicking Day View opens full-screen day view with:
+
+Option: "Every Day" toggle OR date picker to choose exact date
+
+Navigation arrows to go previous/next day
+
+Back button to return to dashboard
+
+Make UI attractive and match project theme.
+
+Acceptance Test
+
+Click Day View → choose a date → view bookings for that date full screen; toggle Every Day showing today.
+
+4) Cancel Booking — Read-Only & Visible Text
+
+Goal: Cancel view must open fully read-only and have visible, high-contrast text.
+
+Requirements
+
+Cancel booking page uses the same layout but:
+
+All inputs disabled/read-only (use readonly or disabled input styles)
+
+Color: text in cancel view must be dark/black for readability (override disabled grayed style)
+
+Action buttons: Close and Export/View only (no edit/save)
+
+Accessibility: ensure sufficient contrast.
+
+Acceptance Test
+
+Click Cancel Booking → fields not editable; text is dark and readable.
+
+5) Date Filter — Smooth UX
+
+Goal: Date filters should update results smoothly (no hard refresh; animated placeholder or spinner; debounced filtering).
+
+Requirements
+
+Single-click sorting/filtering transitions records smoothly.
+
+Use debounce (200–300ms) on user interactions to avoid flicker.
+
+Use loading skeletons or a spinner for short loading times.
+
+Acceptance Test
+
+Click different date filters → data updates smoothly, no double-click required.
+
+6 & 7) Booking Dashboard 3-dots menu — Chalan logic & Actions
+
+Goal: Context menu for each booking: View Logs, Create Chalan, View Chalan, Cancel Booking with correct availability rules.
+
+Rules
+
+If chalan already exists for booking_id:
+
+Show only View Chalan (disable/remove Create Chalan)
+
+If no chalan exists:
+
+Show Create Chalan only (hide View Chalan)
+
+Once a chalan is created for booking, booking can never create another chalan (enforce backend constraint).
+
+View Logs always available, Cancel Booking available per role/permission.
+
+Backend
+
+Enforce uniqueness: UNIQUE INDEX on chalan(booking_id) or check at application layer before create.
+
+API: GET /bookings/:id/chalan to check existence.
+
+Menu should call this endpoint to decide which options to render.
+
+Acceptance Test
+
+Create chalan for booking → 3-dots menu should update and show only View Chalan.
+
+8) Customer Master — Add Contact / Designation input behavior
+
+Goal: When adding contact inside Customer Master, Designation field must allow manual entry and persist.
+
+Requirements
+
+Designation field has:
+
+Dropdown of existing designations
+
++ button (or inline input) to add a new designation
+
+Add flow:
+
+If user types a new designation and saves, store it in designations table OR a designation_master table.
+
+Next time, new designation appears in dropdown.
+
+UX: If designation not present, show “Add new designation” inline or modal quick-add.
+
+Backend
+
+API: POST /designations to add, GET /designations to list.
+
+Prefer idempotent creation (if exists, return existing id).
+
+Acceptance Test
+
+Add new designation “Regional Head” via contact form → next add shows it in dropdown.
+
+9) Decimal Inputs — Price, Quantity, Rate
+
+Goal: Fields like price, rate, quantity accept decimals.
+
+Requirements
+
+All relevant fields should accept decimal input (support at least 2–4 decimal places).
+
+Client-side validation and server-side validation must match.
+
+DB columns: if currently integer, do not change unless necessary; instead validate/convert to DECIMAL(13,4) only if DB change permitted. If DB change not allowed, store decimals as string/float after verifying compatibility.
+
+Provide locale-aware formatting (dot for decimals).
+
+Acceptance Test
+
+Enter 12.75 in quantity and 199.995 in price → accepted and saved.
+
+10) Demo Data — 15 records in modules (except users)
+
+Goal: Insert demo data for testing and UI checks.
+
+Requirements
+
+Add 15 demo records in:
+
+Operations (Bookings)
+
+Master: Customers, Projects, Rooms, Editors (15 each)
+
+Reports (if stored)
+
+Utility: Roles (15 if applicable)
+
+Conflict Reports (sample conflicts)
+
+Chalan entries + Chalan report (15)
+
+Users module: add only 3 users:
+
+admin — full permissions
+
+gst_member — role with most reporting + booking access but not admin
+
+accountant — only permission to create/view chalans (chalan-specific role)
+
+Ensure inter-linking:
+
+Bookings -> Customer -> Project -> Room -> Editor -> Chalan
+
+Example: bookings created reference existing customer_id, project_id, room_id, editor_id
+
+Provide SQL sample for bulk insert (example):
+
+INSERT INTO customers (name, email, phone) VALUES
+('Customer 1','c1@example.com','9000000001'), ... -- 15 rows
+
+
+Include at least 3 bookings per day for one date to test conflict UI.
+
+Acceptance Test
+
+Demo data present and visible in Reports, Dashboard, Conflict report, Chalan report.
+
+11) Fix Company Login Issue — Fix company selection not selectable
+
+Goal: Company dropdown in login must be clickable, load dynamically, validate selection and propagate selected company across session.
+
+Requirements
+
+Login page:
+
+Company dropdown loads via GET /companies (server-side or from session)
+
+Dropdown must be accessible and clickable on all devices
+
+Validate company selection before login: if company not selected → show clear error Please select a company and block login
+
+On successful login:
+
+Save selected company_id in session or token (e.g., session.company_id or embed into JWT payload as company_id)
+
+All subsequent API calls must read company_id from session or token (not from client payload).
+
+Header:
+
+Show only the logged-in company in the header dropdown (no other companies)
+
+Code notes:
+
+Frontend: call POST /auth/login { username, pin, company_id } or call POST /auth/login then POST /auth/select-company — prefer single call.
+
+Backend: authenticate user, check company_id association to user, create session { user_id, company_id, roles }.
+
+Middleware: use req.session.company_id or req.user.company_id to scope queries.
+
+Acceptance Test
+
+Try login without company → fails.
+
+Login with PRISM → header shows only PRISM and all modules respect PRISM scope.
+
+Role / Permission Matrix (summary)
+
+Admin: full
+
+GST Member: booking + reports
+
+Accountant: view/create chalan only (no booking edits)
+
+Chalan creators: role-based; once chalan created for a booking, creation blocked.

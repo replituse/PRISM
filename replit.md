@@ -186,3 +186,12 @@ npx tsx server/seed-demo.ts
 - Light blue color scheme (primary: hsl(199 89% 48%))
 - Production/film-themed background images
 - Professional, clean interface optimized for information density
+
+### December 11, 2025 Updates
+- **Designations Table**: Added designations master table for customer contacts
+- **One Chalan Per Booking**: Enforced unique constraint on chalans.bookingId - each booking can only have one chalan
+- **Chalan API Validation**: POST and PATCH endpoints validate bookingId uniqueness with 409 Conflict response
+- **Day View Page**: Created full-screen day view page at `/calendar/day/:date?` for detailed booking display
+- **Booking Card Enhancement**: Added hasChalan prop to show "Generate Chalan" or "View Chalan" based on chalan existence
+- **Storage Methods**: Added getDesignations, getDesignationByName, createDesignation, getChalanByBookingId, updateChalan
+- **Decimal Support**: Chalan items now support decimal quantity, rate, and amount for precise pricing

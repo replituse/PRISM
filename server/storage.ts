@@ -15,6 +15,7 @@ import {
   chalanItems,
   chalanRevisions,
   userModuleAccess,
+  designations,
   type Company,
   type InsertCompany,
   type User,
@@ -43,6 +44,7 @@ import {
   type InsertChalanRevision,
   type UserModuleAccess,
   type InsertUserModuleAccess,
+  type Designation,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -121,6 +123,17 @@ export interface IStorage {
   // Reports
   getConflicts(from: string, to: string, roomId?: number, editorId?: number): Promise<any[]>;
   getEditorReport(from: string, to: string, editorId?: number): Promise<any[]>;
+
+  // Designations
+  getDesignations(): Promise<Designation[]>;
+  getDesignationByName(name: string): Promise<Designation | undefined>;
+  createDesignation(name: string): Promise<Designation>;
+
+  // Get Chalan by Booking
+  getChalanByBookingId(bookingId: number): Promise<Chalan | undefined>;
+  
+  // Update Chalan
+  updateChalan(id: number, chalan: Partial<InsertChalan>, items?: (InsertChalanItem & { id?: number })[]): Promise<Chalan | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -971,6 +984,53 @@ export class DatabaseStorage implements IStorage {
     }
     
     return reports;
+  }
+
+  // Designations
+  async getDesignations(): Promise<Designation[]> {
+    return db.select().from(designations).orderBy(asc(designations.name));
+  }
+
+  async getDesignationByName(name: string): Promise<Designation | undefined> {
+    const [designation] = await db.select().from(designations).where(eq(designations.name, name));
+    return designation;
+  }
+
+  async createDesignation(name: string): Promise<Designation> {
+    const [created] = await db.insert(designations).values({ name }).returning();
+    return created;
+  }
+
+  // Get Chalan by Booking ID
+  async getChalanByBookingId(bookingId: number): Promise<Chalan | undefined> {
+    const [chalan] = await db.select().from(chalans).where(eq(chalans.bookingId, bookingId));
+    return chalan;
+  }
+
+  // Update Chalan
+  async updateChalan(id: number, chalanData: Partial<InsertChalan>, items?: (InsertChalanItem & { id?: number })[]): Promise<Chalan | undefined> {
+    const [updated] = await db.update(chalans).set(chalanData).where(eq(chalans.id, id)).returning();
+    
+    if (!updated) return undefined;
+
+    if (items) {
+      // Delete existing items and insert new ones
+      await db.delete(chalanItems).where(eq(chalanItems.chalanId, id));
+      
+      if (items.length > 0) {
+        await db.insert(chalanItems).values(
+          items.map(item => ({
+            chalanId: id,
+            description: item.description,
+            quantity: item.quantity,
+            rate: item.rate,
+            amount: item.amount,
+          }))
+        );
+      }
+    }
+
+    return updated;
   }
 }
 

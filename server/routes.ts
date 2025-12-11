@@ -104,6 +104,7 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
       // Set session data (secure server-side authentication)
       req.session.userId = user.id;
       req.session.userRole = user.role;
+      req.session.companyId = data.companyId;
       
       const { password, securityPin, ...userWithoutSensitive } = user;
       res.json({ user: userWithoutSensitive, company });
@@ -137,8 +138,9 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
       if (!user) {
         return res.json({ authenticated: false });
       }
+      const company = req.session?.companyId ? await storage.getCompany(req.session.companyId) : null;
       const { password, securityPin, ...userWithoutSensitive } = user;
-      res.json({ authenticated: true, user: userWithoutSensitive });
+      res.json({ authenticated: true, user: userWithoutSensitive, company });
     } catch (error) {
       res.json({ authenticated: false });
     }
@@ -713,6 +715,18 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
     try {
       const { items, ...chalanData } = req.body;
       const data = insertChalanSchema.parse(chalanData);
+      
+      // Check if a chalan already exists for this booking (one chalan per booking rule)
+      if (data.bookingId) {
+        const existingChalan = await storage.getChalanByBookingId(data.bookingId);
+        if (existingChalan) {
+          return res.status(409).json({ 
+            message: "A chalan already exists for this booking. Each booking can only have one chalan.",
+            existingChalanId: existingChalan.id
+          });
+        }
+      }
+      
       const chalan = await storage.createChalan(data, items || []);
       res.status(201).json(chalan);
     } catch (error: any) {
@@ -765,6 +779,18 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
       }
       
       const { items, ...chalanData } = req.body;
+      
+      // Check if trying to change bookingId to a value that's already used by another chalan
+      if (chalanData.bookingId && chalanData.bookingId !== existingChalan.bookingId) {
+        const chalanWithBooking = await storage.getChalanByBookingId(chalanData.bookingId);
+        if (chalanWithBooking && chalanWithBooking.id !== id) {
+          return res.status(409).json({ 
+            message: "A chalan already exists for this booking. Each booking can only have one chalan.",
+            existingChalanId: chalanWithBooking.id
+          });
+        }
+      }
+      
       const chalan = await storage.updateChalan(id, chalanData, items);
       if (!chalan) {
         return res.status(404).json({ message: "Chalan not found" });
@@ -820,6 +846,47 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
       
       const reports = await storage.getEditorReport(from, to, editorId);
       res.json(reports);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Designations routes
+  app.get("/api/designations", async (req, res) => {
+    try {
+      const designations = await storage.getDesignations();
+      res.json(designations);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/designations", async (req, res) => {
+    try {
+      const { name } = req.body;
+      if (!name || typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ message: "Designation name is required" });
+      }
+      const designation = await storage.createDesignation(name.trim());
+      res.status(201).json(designation);
+    } catch (error: any) {
+      if (error.message?.includes('duplicate') || error.code === '23505') {
+        return res.status(200).json(await storage.getDesignationByName(req.body.name.trim()));
+      }
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Check if chalan exists for a booking
+  app.get("/api/bookings/:id/chalan", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const chalan = await storage.getChalanByBookingId(id);
+      if (chalan) {
+        res.json({ exists: true, chalan });
+      } else {
+        res.json({ exists: false });
+      }
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

@@ -47,6 +47,13 @@ export const customers = pgTable("customers", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Designations Master
+export const designations = pgTable("designations", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Customer Contacts (multiple per customer)
 export const customerContacts = pgTable("customer_contacts", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -145,8 +152,9 @@ export const chalans = pgTable("chalans", {
   chalanNumber: text("chalan_number").notNull().unique(),
   customerId: integer("customer_id").references(() => customers.id).notNull(),
   projectId: integer("project_id").references(() => projects.id).notNull(),
+  bookingId: integer("booking_id").references(() => bookings.id).unique(),
   chalanDate: date("chalan_date").notNull(),
-  totalAmount: integer("total_amount").default(0),
+  totalAmount: text("total_amount").default("0"),
   isCancelled: boolean("is_cancelled").notNull().default(false),
   cancelReason: text("cancel_reason"),
   notes: text("notes"),
@@ -158,9 +166,9 @@ export const chalanItems = pgTable("chalan_items", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   chalanId: integer("chalan_id").references(() => chalans.id).notNull(),
   description: text("description").notNull(),
-  quantity: integer("quantity").default(1),
-  rate: integer("rate").default(0),
-  amount: integer("amount").default(0),
+  quantity: text("quantity").default("1"),
+  rate: text("rate").default("0"),
+  amount: text("amount").default("0"),
 });
 
 // Chalan Revisions
@@ -315,6 +323,7 @@ export const userModuleAccessRelations = relations(userModuleAccess, ({ one }) =
 // Insert Schemas
 export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
+export const insertDesignationSchema = createInsertSchema(designations).omit({ id: true, createdAt: true });
 export const insertCustomerSchema = createInsertSchema(customers).omit({ id: true, createdAt: true });
 export const insertCustomerContactSchema = createInsertSchema(customerContacts).omit({ id: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
@@ -333,6 +342,8 @@ export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Designation = typeof designations.$inferSelect;
+export type InsertDesignation = z.infer<typeof insertDesignationSchema>;
 export type Customer = typeof customers.$inferSelect;
 export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
 export type CustomerContact = typeof customerContacts.$inferSelect;

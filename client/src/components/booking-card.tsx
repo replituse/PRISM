@@ -23,6 +23,7 @@ interface BookingCardProps {
   onViewLogs?: (booking: BookingWithRelations) => void;
   onCreateChalan?: (booking: BookingWithRelations) => void;
   onViewChalan?: (booking: BookingWithRelations) => void;
+  hasChalan?: boolean;
   compact?: boolean;
 }
 
@@ -40,6 +41,7 @@ export function BookingCard({
   onViewLogs,
   onCreateChalan,
   onViewChalan,
+  hasChalan = false,
   compact = false,
 }: BookingCardProps) {
   const statusColors = {
@@ -135,26 +137,29 @@ export function BookingCard({
                     View Logs
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCreateChalan?.(booking);
-                    }}
-                    data-testid={`booking-create-chalan-${booking.id}`}
-                  >
-                    <FilePlus className="h-4 w-4 mr-2" />
-                    Create Chalan
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onViewChalan?.(booking);
-                    }}
-                    data-testid={`booking-view-chalan-${booking.id}`}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Chalan
-                  </DropdownMenuItem>
+                  {hasChalan ? (
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewChalan?.(booking);
+                      }}
+                      data-testid={`booking-view-chalan-${booking.id}`}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Chalan
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCreateChalan?.(booking);
+                      }}
+                      data-testid={`booking-create-chalan-${booking.id}`}
+                    >
+                      <FilePlus className="h-4 w-4 mr-2" />
+                      Generate Chalan
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-destructive"

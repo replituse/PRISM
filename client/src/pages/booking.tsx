@@ -61,7 +61,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import type { BookingWithRelations, Room } from "@shared/schema";
+import type { BookingWithRelations, Room, Chalan } from "@shared/schema";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -109,6 +109,22 @@ export default function BookingPage() {
   const { data: rooms = [] } = useQuery<Room[]>({
     queryKey: ["/api/rooms"],
   });
+
+  const { data: chalans = [] } = useQuery<Chalan[]>({
+    queryKey: [`/api/chalans?from=${fromDate}&to=${toDate}`],
+  });
+
+  const bookingChalanMap = useMemo(() => {
+    const map = new Set<number>();
+    chalans.forEach((chalan) => {
+      if (chalan.bookingId) {
+        map.add(chalan.bookingId);
+      }
+    });
+    return map;
+  }, [chalans]);
+
+  const hasChalan = (bookingId: number) => bookingChalanMap.has(bookingId);
 
   const { data: bookingLogs = [] } = useQuery({
     queryKey: [`/api/bookings/${viewingBooking?.id}/logs`],
@@ -461,6 +477,7 @@ export default function BookingPage() {
                           onViewLogs={handleViewLogs}
                           onCreateChalan={handleCreateChalan}
                           onViewChalan={handleViewChalan}
+                          hasChalan={hasChalan(booking.id)}
                           compact
                         />
                       ))}
@@ -646,6 +663,7 @@ export default function BookingPage() {
                     }}
                     onCreateChalan={handleCreateChalan}
                     onViewChalan={handleViewChalan}
+                    hasChalan={hasChalan(booking.id)}
                   />
                 ))
               ) : (

@@ -23,6 +23,7 @@ import EditorReportPage from "@/pages/reports/editor";
 import ChalanReportPage from "@/pages/reports/chalan";
 import UserRightsPage from "@/pages/utility/user-rights";
 import UsersPage from "@/pages/utility/users";
+import CalendarDayView from "@/pages/calendar-day-view";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -54,6 +55,7 @@ function AppRoutes() {
           <SidebarInset className="flex-1 overflow-hidden">
             <Switch>
               <Route path="/" component={BookingPage} />
+              <Route path="/calendar/day/:date?" component={CalendarDayView} />
               <Route path="/leaves" component={LeavesPage} />
               <Route path="/chalan" component={ChalanPage} />
               <Route path="/chalan/revise" component={ChalanRevisePage} />
