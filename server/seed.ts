@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { 
   companies, users, customers, customerContacts, projects, rooms, editors, 
-  bookings, chalans, chalanItems, designations
+  bookings, chalans, chalanItems, designations, userModuleAccess, editorLeaves
 } from "@shared/schema";
 
 async function seed() {
@@ -11,12 +11,14 @@ async function seed() {
   await db.delete(chalanItems);
   await db.delete(chalans);
   await db.delete(bookings);
+  await db.delete(editorLeaves);
   await db.delete(customerContacts);
   await db.delete(projects);
   await db.delete(customers);
   await db.delete(editors);
   await db.delete(rooms);
   await db.delete(designations);
+  await db.delete(userModuleAccess);
   await db.delete(users);
   await db.delete(companies);
 
@@ -28,8 +30,11 @@ async function seed() {
 
   console.log("Companies created:", prism.id, airavata.id);
 
-  // 2. Insert Admin Users (password is hashed PIN for simplicity in demo)
-  await db.insert(users).values([
+  // 2. Insert Users with specific roles:
+  // - admin: full access
+  // - gst_member: booking + report access  
+  // - accountant: can only create/view chalan (no booking edits)
+  const insertedUsers = await db.insert(users).values([
     { 
       username: "admin", 
       password: "1234", 
@@ -41,6 +46,26 @@ async function seed() {
       mobile: "9876543210"
     },
     { 
+      username: "gst_member", 
+      password: "1234", 
+      securityPin: "1234", 
+      role: "gst", 
+      companyId: prism.id,
+      fullName: "GST Member",
+      email: "gst@prism.com",
+      mobile: "9876543212"
+    },
+    { 
+      username: "accountant", 
+      password: "1234", 
+      securityPin: "1234", 
+      role: "non_gst", 
+      companyId: prism.id,
+      fullName: "Accountant",
+      email: "accountant@prism.com",
+      mobile: "9876543213"
+    },
+    { 
       username: "airavata_admin", 
       password: "1234", 
       securityPin: "1234", 
@@ -50,9 +75,37 @@ async function seed() {
       email: "admin@airavata.com",
       mobile: "9876543211"
     },
-  ]);
+  ]).returning();
 
-  console.log("Users created");
+  console.log("Users created:", insertedUsers.length);
+
+  // 2.5 Set user module access permissions
+  // gst_member: booking + report access
+  // accountant: can only create/view chalan (no booking edits)
+  const gstMember = insertedUsers.find(u => u.username === "gst_member");
+  const accountant = insertedUsers.find(u => u.username === "accountant");
+
+  if (gstMember) {
+    await db.insert(userModuleAccess).values([
+      { userId: gstMember.id, module: "bookings", canView: true, canCreate: true, canEdit: true, canDelete: false },
+      { userId: gstMember.id, module: "reports", canView: true, canCreate: false, canEdit: false, canDelete: false },
+      { userId: gstMember.id, module: "customers", canView: true, canCreate: false, canEdit: false, canDelete: false },
+      { userId: gstMember.id, module: "projects", canView: true, canCreate: false, canEdit: false, canDelete: false },
+      { userId: gstMember.id, module: "rooms", canView: true, canCreate: false, canEdit: false, canDelete: false },
+      { userId: gstMember.id, module: "editors", canView: true, canCreate: false, canEdit: false, canDelete: false },
+    ]);
+  }
+
+  if (accountant) {
+    await db.insert(userModuleAccess).values([
+      { userId: accountant.id, module: "chalans", canView: true, canCreate: true, canEdit: false, canDelete: false },
+      { userId: accountant.id, module: "customers", canView: true, canCreate: false, canEdit: false, canDelete: false },
+      { userId: accountant.id, module: "projects", canView: true, canCreate: false, canEdit: false, canDelete: false },
+      { userId: accountant.id, module: "bookings", canView: true, canCreate: false, canEdit: false, canDelete: false },
+    ]);
+  }
+
+  console.log("User module access permissions set");
 
   // 3. Insert Designations (15)
   const designationNames = [
@@ -67,7 +120,7 @@ async function seed() {
 
   console.log("Designations created");
 
-  // 4. Insert Customers (15)
+  // 4. Insert Customers (20)
   const customerData = [
     { name: "Rajesh Kumar", companyName: "Dharma Productions", phone: "9000000001", email: "rajesh@dharma.com", gstNumber: "27AABCD1234E1ZA" },
     { name: "Priya Sharma", companyName: "Yash Raj Films", phone: "9000000002", email: "priya@yrf.com", gstNumber: "27AABCD1234E1ZB" },
@@ -84,6 +137,11 @@ async function seed() {
     { name: "Deepak Jain", companyName: "Fox Star Studios", phone: "9000000013", email: "deepak@foxstar.com", gstNumber: "27AABCD1234E1ZM" },
     { name: "Anita Roy", companyName: "Zee Studios", phone: "9000000014", email: "anita@zee.com", gstNumber: "27AABCD1234E1ZN" },
     { name: "Karan Malhotra", companyName: "AA Films", phone: "9000000015", email: "karan@aafilms.com", gstNumber: "27AABCD1234E1ZO" },
+    { name: "Rohan Desai", companyName: "Netflix India", phone: "9000000016", email: "rohan@netflix.in", gstNumber: "27AABCD1234E1ZP" },
+    { name: "Anjali Menon", companyName: "Amazon Prime Video", phone: "9000000017", email: "anjali@amazon.in", gstNumber: "27AABCD1234E1ZQ" },
+    { name: "Vivek Oberoi", companyName: "Disney+ Hotstar", phone: "9000000018", email: "vivek@hotstar.com", gstNumber: "27AABCD1234E1ZR" },
+    { name: "Shreya Ghoshal", companyName: "Sony Pictures India", phone: "9000000019", email: "shreya@sonypictures.in", gstNumber: "27AABCD1234E1ZS" },
+    { name: "Aditya Chopra", companyName: "Maddock Films", phone: "9000000020", email: "aditya@maddock.com", gstNumber: "27AABCD1234E1ZT" },
   ];
 
   const insertedCustomers = await db.insert(customers).values(customerData).returning();
@@ -98,7 +156,7 @@ async function seed() {
   const insertedContacts = await db.insert(customerContacts).values(contactData).returning();
   console.log("Customer contacts created:", insertedContacts.length);
 
-  // 6. Insert Projects (15) - linked to customers
+  // 6. Insert Projects (20) - linked to customers
   const projectTypes: ("movie" | "serial" | "web_series" | "ad" | "teaser" | "trilogy")[] = ["movie", "serial", "web_series", "ad", "teaser", "trilogy"];
   const projectData = [
     { name: "The Last Kingdom", customerId: insertedCustomers[0].id, projectType: projectTypes[0], description: "Epic historical drama" },
@@ -116,26 +174,36 @@ async function seed() {
     { name: "Comedy Central", customerId: insertedCustomers[12].id, projectType: projectTypes[1], description: "Comedy show" },
     { name: "Documentary Life", customerId: insertedCustomers[13].id, projectType: projectTypes[2], description: "Wildlife documentary" },
     { name: "Fashion Week", customerId: insertedCustomers[14].id, projectType: projectTypes[3], description: "Fashion brand campaign" },
+    { name: "Streaming Exclusive", customerId: insertedCustomers[15].id, projectType: projectTypes[2], description: "Netflix original series" },
+    { name: "Prime Original", customerId: insertedCustomers[16].id, projectType: projectTypes[2], description: "Amazon original content" },
+    { name: "Hotstar Special", customerId: insertedCustomers[17].id, projectType: projectTypes[1], description: "Hotstar exclusive serial" },
+    { name: "Bollywood Blockbuster", customerId: insertedCustomers[18].id, projectType: projectTypes[0], description: "Major Bollywood movie" },
+    { name: "Indie Film Project", customerId: insertedCustomers[19].id, projectType: projectTypes[0], description: "Independent film production" },
   ];
 
   const insertedProjects = await db.insert(projects).values(projectData).returning();
   console.log("Projects created:", insertedProjects.length);
 
-  // 7. Insert Rooms (15)
+  // 7. Insert Rooms (20)
   const roomTypes: ("sound" | "music" | "vfx" | "client_office" | "editing" | "dubbing" | "mixing")[] = ["sound", "music", "vfx", "client_office", "editing", "dubbing", "mixing"];
   const roomData = [
     { name: "Sound Stage A", roomType: roomTypes[0], capacity: 10 },
     { name: "Sound Stage B", roomType: roomTypes[0], capacity: 8 },
+    { name: "Sound Stage C", roomType: roomTypes[0], capacity: 6 },
     { name: "Music Studio 1", roomType: roomTypes[1], capacity: 6 },
     { name: "Music Studio 2", roomType: roomTypes[1], capacity: 4 },
+    { name: "Music Recording Room", roomType: roomTypes[1], capacity: 3 },
     { name: "VFX Bay 1", roomType: roomTypes[2], capacity: 5 },
     { name: "VFX Bay 2", roomType: roomTypes[2], capacity: 5 },
+    { name: "VFX Bay 3", roomType: roomTypes[2], capacity: 4 },
     { name: "Client Lounge", roomType: roomTypes[3], capacity: 15 },
     { name: "Editing Suite 1", roomType: roomTypes[4], capacity: 3 },
     { name: "Editing Suite 2", roomType: roomTypes[4], capacity: 3 },
     { name: "Editing Suite 3", roomType: roomTypes[4], capacity: 3 },
+    { name: "Editing Suite 4", roomType: roomTypes[4], capacity: 2 },
     { name: "Dubbing Room 1", roomType: roomTypes[5], capacity: 4 },
     { name: "Dubbing Room 2", roomType: roomTypes[5], capacity: 4 },
+    { name: "Dubbing Room 3", roomType: roomTypes[5], capacity: 3 },
     { name: "Mixing Theatre 1", roomType: roomTypes[6], capacity: 20 },
     { name: "Mixing Theatre 2", roomType: roomTypes[6], capacity: 15 },
     { name: "Preview Theatre", roomType: roomTypes[3], capacity: 50 },
@@ -144,7 +212,7 @@ async function seed() {
   const insertedRooms = await db.insert(rooms).values(roomData).returning();
   console.log("Rooms created:", insertedRooms.length);
 
-  // 8. Insert Editors (15)
+  // 8. Insert Editors (20)
   const editorTypes: ("video" | "audio" | "vfx" | "colorist" | "di")[] = ["video", "audio", "vfx", "colorist", "di"];
   const editorData = [
     { name: "Rahul Sharma", editorType: editorTypes[0], phone: "9100000001", email: "rahul.editor@email.com" },
@@ -162,6 +230,11 @@ async function seed() {
     { name: "Arjun Das", editorType: editorTypes[1], phone: "9100000013", email: "arjun.audio@email.com" },
     { name: "Kavita Shah", editorType: editorTypes[2], phone: "9100000014", email: "kavita.vfx@email.com" },
     { name: "Ravi Teja", editorType: editorTypes[3], phone: "9100000015", email: "ravi.colorist@email.com" },
+    { name: "Arun Krishnan", editorType: editorTypes[4], phone: "9100000016", email: "arun.di@email.com" },
+    { name: "Maya Iyer", editorType: editorTypes[0], phone: "9100000017", email: "maya.editor@email.com" },
+    { name: "Rohit Pillai", editorType: editorTypes[1], phone: "9100000018", email: "rohit.audio@email.com" },
+    { name: "Shreya Menon", editorType: editorTypes[2], phone: "9100000019", email: "shreya.vfx@email.com" },
+    { name: "Vijay Raman", editorType: editorTypes[4], phone: "9100000020", email: "vijay.di@email.com" },
   ];
 
   const insertedEditors = await db.insert(editors).values(editorData).returning();
@@ -183,8 +256,8 @@ async function seed() {
   const bookingData = [
     // Today's bookings - 3 overlapping for conflict testing (same room, overlapping times)
     { roomId: insertedRooms[0].id, customerId: insertedCustomers[0].id, projectId: insertedProjects[0].id, contactId: insertedContacts[0].id, editorId: insertedEditors[0].id, bookingDate: getDate(0), fromTime: "09:00", toTime: "12:00", status: bookingStatuses[2] },
-    { roomId: insertedRooms[0].id, customerId: insertedCustomers[1].id, projectId: insertedProjects[1].id, contactId: insertedContacts[2].id, editorId: insertedEditors[1].id, bookingDate: getDate(0), fromTime: "11:00", toTime: "14:00", status: bookingStatuses[2] }, // CONFLICT
-    { roomId: insertedRooms[0].id, customerId: insertedCustomers[2].id, projectId: insertedProjects[2].id, contactId: insertedContacts[4].id, editorId: insertedEditors[2].id, bookingDate: getDate(0), fromTime: "13:00", toTime: "16:00", status: bookingStatuses[2] }, // CONFLICT
+    { roomId: insertedRooms[0].id, customerId: insertedCustomers[1].id, projectId: insertedProjects[1].id, contactId: insertedContacts[2].id, editorId: insertedEditors[1].id, bookingDate: getDate(0), fromTime: "11:00", toTime: "14:00", status: bookingStatuses[2] }, // CONFLICT 1
+    { roomId: insertedRooms[0].id, customerId: insertedCustomers[2].id, projectId: insertedProjects[2].id, contactId: insertedContacts[4].id, editorId: insertedEditors[2].id, bookingDate: getDate(0), fromTime: "13:00", toTime: "16:00", status: bookingStatuses[2] }, // CONFLICT 2
     
     // More bookings spread across different rooms and dates
     { roomId: insertedRooms[1].id, customerId: insertedCustomers[3].id, projectId: insertedProjects[3].id, contactId: insertedContacts[6].id, editorId: insertedEditors[3].id, bookingDate: getDate(0), fromTime: "10:00", toTime: "13:00", status: bookingStatuses[2] },
@@ -195,9 +268,9 @@ async function seed() {
     { roomId: insertedRooms[1].id, customerId: insertedCustomers[6].id, projectId: insertedProjects[6].id, contactId: insertedContacts[12].id, editorId: insertedEditors[6].id, bookingDate: getDate(1), fromTime: "10:00", toTime: "14:00", status: bookingStatuses[2] },
     { roomId: insertedRooms[3].id, customerId: insertedCustomers[7].id, projectId: insertedProjects[7].id, contactId: insertedContacts[14].id, editorId: insertedEditors[7].id, bookingDate: getDate(1), fromTime: "15:00", toTime: "18:00", status: bookingStatuses[1] },
     
-    // Day after tomorrow
-    { roomId: insertedRooms[4].id, customerId: insertedCustomers[8].id, projectId: insertedProjects[8].id, contactId: insertedContacts[16].id, editorId: insertedEditors[8].id, bookingDate: getDate(2), fromTime: "09:00", toTime: "11:00", status: bookingStatuses[2] },
-    { roomId: insertedRooms[5].id, customerId: insertedCustomers[9].id, projectId: insertedProjects[9].id, contactId: insertedContacts[18].id, editorId: insertedEditors[9].id, bookingDate: getDate(2), fromTime: "11:00", toTime: "14:00", status: bookingStatuses[0] },
+    // Day after tomorrow - with another conflict
+    { roomId: insertedRooms[4].id, customerId: insertedCustomers[8].id, projectId: insertedProjects[8].id, contactId: insertedContacts[16].id, editorId: insertedEditors[8].id, bookingDate: getDate(2), fromTime: "09:00", toTime: "12:00", status: bookingStatuses[2] },
+    { roomId: insertedRooms[4].id, customerId: insertedCustomers[9].id, projectId: insertedProjects[9].id, contactId: insertedContacts[18].id, editorId: insertedEditors[9].id, bookingDate: getDate(2), fromTime: "11:00", toTime: "14:00", status: bookingStatuses[2] }, // CONFLICT 3
     
     // More future bookings
     { roomId: insertedRooms[6].id, customerId: insertedCustomers[10].id, projectId: insertedProjects[10].id, contactId: insertedContacts[20].id, editorId: insertedEditors[10].id, bookingDate: getDate(3), fromTime: "10:00", toTime: "13:00", status: bookingStatuses[2] },
@@ -205,13 +278,31 @@ async function seed() {
     { roomId: insertedRooms[8].id, customerId: insertedCustomers[12].id, projectId: insertedProjects[12].id, contactId: insertedContacts[24].id, editorId: insertedEditors[12].id, bookingDate: getDate(4), fromTime: "09:00", toTime: "12:00", status: bookingStatuses[2] },
     { roomId: insertedRooms[9].id, customerId: insertedCustomers[13].id, projectId: insertedProjects[13].id, contactId: insertedContacts[26].id, editorId: insertedEditors[13].id, bookingDate: getDate(4), fromTime: "13:00", toTime: "16:00", status: bookingStatuses[0] },
     { roomId: insertedRooms[10].id, customerId: insertedCustomers[14].id, projectId: insertedProjects[14].id, contactId: insertedContacts[28].id, editorId: insertedEditors[14].id, bookingDate: getDate(5), fromTime: "10:00", toTime: "14:00", status: bookingStatuses[2] },
+    // Additional bookings to reach 20
+    { roomId: insertedRooms[11].id, customerId: insertedCustomers[15].id, projectId: insertedProjects[15].id, contactId: insertedContacts[30].id, editorId: insertedEditors[15].id, bookingDate: getDate(5), fromTime: "15:00", toTime: "18:00", status: bookingStatuses[2] },
+    { roomId: insertedRooms[12].id, customerId: insertedCustomers[16].id, projectId: insertedProjects[16].id, contactId: insertedContacts[32].id, editorId: insertedEditors[16].id, bookingDate: getDate(6), fromTime: "09:00", toTime: "12:00", status: bookingStatuses[0] },
+    { roomId: insertedRooms[13].id, customerId: insertedCustomers[17].id, projectId: insertedProjects[17].id, contactId: insertedContacts[34].id, editorId: insertedEditors[17].id, bookingDate: getDate(6), fromTime: "14:00", toTime: "18:00", status: bookingStatuses[1] },
+    { roomId: insertedRooms[14].id, customerId: insertedCustomers[18].id, projectId: insertedProjects[18].id, contactId: insertedContacts[36].id, editorId: insertedEditors[18].id, bookingDate: getDate(7), fromTime: "10:00", toTime: "13:00", status: bookingStatuses[2] },
+    { roomId: insertedRooms[15].id, customerId: insertedCustomers[19].id, projectId: insertedProjects[19].id, contactId: insertedContacts[38].id, editorId: insertedEditors[19].id, bookingDate: getDate(7), fromTime: "14:00", toTime: "17:00", status: bookingStatuses[2] },
   ];
 
   const insertedBookings = await db.insert(bookings).values(bookingData).returning();
   console.log("Bookings created:", insertedBookings.length);
 
-  // 10. Insert Chalans (15) - linked to bookings, customers, projects
-  const chalanData = insertedBookings.slice(0, 15).map((booking, idx) => ({
+  // 9.5 Insert Editor Leaves (for conflict testing)
+  const editorLeaveData = [
+    { editorId: insertedEditors[0].id, fromDate: getDate(10), toDate: getDate(12), reason: "Annual Leave" },
+    { editorId: insertedEditors[1].id, fromDate: getDate(8), toDate: getDate(9), reason: "Personal Work" },
+    { editorId: insertedEditors[2].id, fromDate: getDate(15), toDate: getDate(15), reason: "Medical Appointment" },
+    { editorId: insertedEditors[3].id, fromDate: getDate(20), toDate: getDate(22), reason: "Family Function" },
+    { editorId: insertedEditors[4].id, fromDate: getDate(5), toDate: getDate(5), reason: "Sick Leave" },
+  ];
+
+  await db.insert(editorLeaves).values(editorLeaveData);
+  console.log("Editor leaves created:", editorLeaveData.length);
+
+  // 10. Insert Chalans (20) - linked to bookings, customers, projects
+  const chalanData = insertedBookings.slice(0, 20).map((booking, idx) => ({
     chalanNumber: `CHN-2024-${String(idx + 1).padStart(4, '0')}`,
     customerId: booking.customerId,
     projectId: booking.projectId,
@@ -236,8 +327,12 @@ async function seed() {
 
   console.log("\nSeeding completed successfully!");
   console.log("\nLogin credentials:");
-  console.log("- PRISM: admin / 1234");
-  console.log("- Airavata Studio: airavata_admin / 1234");
+  console.log("PRISM company:");
+  console.log("  - admin / 1234 (full access)");
+  console.log("  - gst_member / 1234 (booking + report access)");
+  console.log("  - accountant / 1234 (chalan create/view only)");
+  console.log("Airavata Studio:");
+  console.log("  - airavata_admin / 1234");
 }
 
 seed()
