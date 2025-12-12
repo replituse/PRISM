@@ -205,9 +205,8 @@ export default function BookingPage() {
 
   const handleNewBooking = (date?: Date) => {
     setEditingBooking(null);
-    if (date) {
-      setSelectedDate(date);
-    }
+    // Always set the date: use provided date or default to today
+    setSelectedDate(date || new Date());
     setBookingFormOpen(true);
   };
 

@@ -1,0 +1,297 @@
+Apply the Following Changes to My Existing Project
+
+(Do NOT change major functionality, structure, or design.)
+
+1️⃣ Chalan Must Have a Unique Chalan ID
+
+Add a unique chalan_id for every chalan created.
+
+Format can be: CHL-000001, CHL-000002… OR use auto-increment with prefix.
+
+Ensure unique ID is returned and displayed everywhere (reports, view chalan, booking details).
+
+NO change in existing DB structure (use existing fields or generate ID in backend).
+
+2️⃣ Schedule Booking → Default Date Must Be Today
+
+When user clicks Schedule Booking, open booking form with:
+
+Current date auto-filled
+
+User should not need to pick a date manually
+
+Other behavior remains exactly as it is.
+
+3️⃣ Booking Dashboard – Show Only 2 Items + “+2/+3 More” → Open Day View
+
+Dashboard booking cell should initially display only 2 records.
+
+If more records exist, show "+2 more" / "+3 more", etc.
+
+Clicking the “+X more” opens Day View in full screen, not popup.
+
+Inside Day View, keep the 3-dots menu fully functional:
+
+View Logs
+
+Create Chalan
+
+View Chalan
+
+Cancel Booking
+
+4️⃣ Fix Chalan Creation Error (See Screenshot)
+
+Error: “Expected string, received number (totalAmount)”
+
+Fix:
+
+Update backend API validation to accept number for:
+
+totalAmount
+
+grandTotal
+
+amount
+
+rate
+
+Convert numbers to string internally ONLY if the existing system requires it — but do not break any existing logic.
+
+Fix chalan generation from booking page and direct chalan module:
+
+Chalan must successfully create
+
+Must store decimal values
+
+Must allow viewing after creation
+
+5️⃣ Conflict Report – Add “Update” Button + Update Form
+
+Enhance conflict report without UI redesign:
+
+Conflict report must show:
+
+Keep This
+
+Update (NEW)
+
+Update button behavior:
+
+Opens booking form for that conflict booking.
+
+Shows the conflict warning clearly.
+
+Allows user to edit (reschedule or modify fields).
+
+Once conflict is resolved:
+
+Record should automatically disappear from conflict report.
+
+Updated booking must reflect correctly in:
+
+Dashboard
+
+Booking list
+
+Reports
+
+Chalan (if applicable)
+
+6️⃣ Fix All Filters in Reports + Conflict Report
+
+Filters must work properly:
+
+By month
+
+By single date
+
+By date range (From → To)
+
+By customer
+
+By project
+
+By company
+
+Smooth data loading
+
+No delay, no blank results
+
+Fix filters in:
+
+Conflict Report
+
+Booking Report
+
+Chalan Report
+
+Customer Report
+
+All other modules using date/sort filters
+
+7️⃣ Day View → “New Booking” Button Not Working
+
+Fix the button so that:
+
+Clicking New Booking in Day View opens full booking form
+
+Default date should be the same day currently viewed
+
+No popup; open the regular booking creation screen
+
+8️⃣ User Edit Screen – Fix Alignment & Full Editability
+
+Inside login user account screen:
+
+All input fields should be editable
+
+Icons must align properly
+
+Text fields should be readable
+
+UI spacing and alignment must be corrected
+(No design change — just fix alignment and usability.)
+
+9️⃣ User Management – Enforce Strict Role-Based Access
+
+When admin assigns a role to another user:
+
+Must restrict complete system access exactly as assigned:
+
+For example:
+
+If admin gives access only to:
+
+Booking Dashboard
+
+Reports
+→ Then the user should see only these 2 modules in sidebar.
+
+Access levels:
+
+For each module:
+
+View
+
+Edit
+
+Delete
+
+Create
+
+Generate Chalan
+
+Cancel Booking
+
+Access Reports
+
+etc.
+
+If user has only view, they must not be able to:
+
+Edit booking
+
+Delete booking
+
+Create or edit chalan
+
+Delete chalan
+
+Generate reports
+
+Edit customer/projects/etc.
+
+Required:
+
+Strict permission check in both frontend & backend.
+
+Do NOT modify overall design — only enforce correct access control.
+
+🔟 Fix Company Login Selection
+
+Use the following login credentials and ensure company selection works properly:
+
+PRISM:
+
+Username: admin
+
+PIN: 1234
+
+Airavata Studio:
+
+Username: airavata_admin
+
+PIN: 1234
+
+Fix:
+
+Company dropdown must be selectable
+
+Must load dynamically
+
+Must pass selected company_id to backend
+
+Must show only the logged-in company in header and all modules
+
+1️⃣1️⃣ Insert Demo Data – 20 Records Per Module (Except Users)
+
+Add 20 demo records in:
+
+Booking
+
+Customers
+
+Projects
+
+Rooms
+
+Editors
+
+Reports
+
+Chalan
+
+Conflict Records (2–3 conflict entries)
+
+Roles & Utilities
+
+Demo data requirements:
+
+Realistic fields
+
+Proper interlinked data
+
+Booking → Customer → Project → Room → Editor → Chalan
+
+Conflicts generated for at least 2–3 bookings
+
+User Demo Data:
+
+Only 3 users must be created:
+
+admin – full access
+
+gst_member – booking + report access
+
+accountant – can only create/view chalan (no booking edits)
+
+✅ Deliver What I Expect Back
+
+Fix chalan creation error
+
+Unique chalan ID
+
+Full day view working
+
+Conflict update flow working
+
+Reports filters fixed
+
+Role rights fully enforced
+
+Company login fix
+
+Demo data insert
+
+No major functional or design changes
