@@ -1,0 +1,179 @@
+Apply Below Enhancements to Existing Project
+
+IMPORTANT:
+Work only on my existing project.
+Do NOT change major functionality, working flow, structure, database schema, or UI design.
+Only add, fix, and enhance features exactly as described below.
+
+1️⃣ Add Soft Reload / Sync Button (Global Data Refresh)
+
+Add a soft reload (sync) button for data refresh.
+
+Requirements:
+
+Position the reload button:
+
+Top right corner OR
+
+Right side of booking summary counters
+(Planning / Tentative / Confirmed / Cancelled)
+
+Button behavior:
+
+Fetch latest data from backend
+
+Refresh UI without full page reload
+
+Show loading indicator during fetch
+
+Apply this reload button in every major module:
+
+Booking Dashboard
+
+Master modules
+
+Reports
+
+Chalan
+
+Conflict Report
+
+Use this button as reference/sync data refresh across project.
+
+2️⃣ Chalan Entry – Active / Inactive Toggle (No Popup)
+
+In Chalan Entry, replace any popup status change with:
+
+Inline Active / Inactive toggle button
+
+Toggle must:
+
+Update database instantly
+
+Reflect status immediately in UI
+
+Respect user permissions
+
+Keep existing layout intact.
+
+3️⃣ Delete Action – Permanent DB Delete
+
+In Action column, when user clicks Delete:
+
+Permanently delete record from database
+
+Remove record immediately from UI
+
+No soft delete, no hide-only logic.
+
+Show confirmation dialog before delete.
+
+Apply this logic consistently across all modules.
+
+4️⃣ User Management – Status Toggle
+
+In User Management, add:
+
+Active / Inactive toggle in Status column
+
+Same behavior as:
+
+Customer Master
+
+Project Master
+
+Toggle must:
+
+Update DB
+
+Immediately reflect in UI
+
+Prevent inactive users from login/access
+
+5️⃣ Temporary Hardcoded Companies for Login (Stored in DB)
+
+Temporarily configure two companies:
+
+PRISM
+
+AIRAVATA STUDIO
+
+Requirements:
+
+Insert these companies into database
+
+Login page company dropdown should load only these two
+
+Selected company must:
+
+Be stored in session
+
+Reflect across header and all modules
+
+Keep logic flexible for future dynamic companies.
+
+6️⃣ User Roles – No Hardcoded GST / Non-GST Users
+
+Fix user role logic.
+
+Required:
+
+Remove any hardcoded GST / Non-GST user logic
+
+Only Admin should exist by default:
+
+Full access
+
+Admin can create users with custom permissions:
+
+View only
+
+Edit only
+
+Delete
+
+Create
+
+Chalan access
+
+Booking access
+
+Report access
+
+UI and backend must strictly enforce permissions:
+
+Hide buttons
+
+Block API access
+
+Example:
+
+If user has Booking – View Only:
+
+Can view booking
+
+Cannot edit, delete, cancel, or create booking
+
+⚠️ Important Notes
+
+Do NOT change DB schema unless absolutely required.
+
+Do NOT redesign UI.
+
+Do NOT break existing workflows.
+
+Follow existing coding standards.
+
+✅ Expected Outcome
+
+Global soft reload button works everywhere
+
+Chalan status toggle inline
+
+Delete action permanently removes records
+
+User status toggle works
+
+Company login fixed with PRISM & AIRAVATA STUDIO
+
+Role-based access fully controlled by admin

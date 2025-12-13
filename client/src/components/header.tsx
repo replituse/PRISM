@@ -5,6 +5,7 @@ import { useLocation } from "wouter";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SyncButton } from "@/components/sync-button";
 import { useAuth } from "@/lib/auth-context";
 
 const routeTitles: Record<string, string> = {
@@ -104,6 +105,7 @@ export function Header({
           </div>
         )}
 
+        <SyncButton />
         <ThemeToggle />
       </div>
     </header>
